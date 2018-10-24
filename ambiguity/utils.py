@@ -3,25 +3,9 @@
 from collections import defaultdict
 import itertools as it
 import logging
-import matplotlib.pyplot as plt
 import numpy as np
 
-import seaborn as sns
-
 logging.getLogger().setLevel(logging.INFO)
-
-sns.set(style="whitegrid")
-
-
-def efficiency_plot(df):
-    plt.scatter(x=df['listener_effort'].values, y=df['speaker_effort'].values,
-                c=df['color'], edgecolors='w', alpha=0.7)
-    plt.title("System cross entropy")
-    plt.xlabel("Expected listener effort")
-    plt.ylabel("Expected speaker effort")
-    plt.xlim(-0.25, 2.)
-    plt.ylim(-0.25, 2.)
-    plt.savefig("efficiency.png")
 
 
 def all_meanings_available_filter(M):

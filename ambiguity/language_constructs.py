@@ -1,7 +1,7 @@
 """language_constructs.py"""
 
 import itertools as it
-from utils import *
+from .utils import *
 
 
 def get_utterance_prob(utterance, utterances, utterance_probs):
@@ -19,7 +19,7 @@ class Objective:
         self.speaker = speaker
         self.listener = listener
         self.language = language
-        self.events = list(it.product(language.meanings, language.utterances))
+        self.events = list(it.product(language.utterances, language.meanings))
 
     def compute_cost(self):
         raise NotImplementedError()
@@ -28,14 +28,42 @@ class Objective:
 class SpeakerListenerCrossEntropy(Objective):
     """H_c(P_s(u, m), P_l(u, m))"""
 
-    def __init__(self, speaker, listener, language):
-        self.speaker = speaker
-        self.listener = listener
-        self.language = language
-        self.events = list(it.product(language.meanings, language.utterances))
-
     def compute_cost(self):
-        raise NotImplementedError()
+        """Compute H_c(P_s(u, m), P_l(u, m))
+
+        = \sum_{u, m}P_s(u, m)log(P_l(u, m))
+        = \sum_{u, m}P_s(u, m)log(p(u)) + \sum_{u, m}P_s(u, m)log(L(m|u))
+        = E[speaker effort] + E[listener effort]
+
+        Returns
+        -------
+        tuple of floats
+            (Cross entropy score, avg speaker effort, avg listener effort)
+
+        """
+        expected_speaker_effort = 0.
+        expected_listener_effort = 0.
+        for u, m in self.events:
+            # meanings prior
+            p_m = get_meaning_prob(m, language.meanings,
+                                   language.p_meanings)
+            # utterances prior
+            p_u = get_utterance_prob(u, language.utterances,
+                                     language.p_utterances)
+            # S(u|m)
+            s_u_given_m = self.speaker.p_speak(u, m)
+            # L(m|u)
+            l_m_given_u = self.listener.p_listen(u, m)
+            # P_s(u, m)
+            p_joint_speaker = p_m * s_u_given_m
+            expected_speaker_effort += p_joint_speaker * -np.log(p_u)
+            expected_listener_effort += \
+                (p_joint_speaker * -np.log(l_m_given_u)) \
+                    if l_m_given_u != 0. else 0.
+
+        ce_score = (expected_speaker_effort + expected_listener_effort)
+
+        return ce_score, expected_speaker_effort, expected_listener_effort
 
 
 class FerrerCost(Objective):
@@ -45,15 +73,41 @@ class FerrerCost(Objective):
 
     """
 
-    def __init__(self, speaker, listener, language):
-        self.super(Objective, self).__init__(speaker, listener, language)
-        self.speaker = speaker
-        self.listener = listener
-        self.language = language
-        self.events = list(it.product(language.meanings, language.utterances))
+    def compute_cost(self, eta=0.5):
+        """Compute \eta * H_s(u, m) + (1 - \eta) * H_s(u, m)
 
-    def compute_cost(self):
-        raise NotImplementedError()
+        Returns
+        -------
+        tuple of floats
+            (total cost, H_s, H_l)
+
+        """
+        H_s = 0.
+        H_l = 0.
+        for u, m in self.events:
+            # meanings prior
+            p_m = get_meaning_prob(m, language.meanings,
+                                   language.p_meanings)
+            # utterances prior
+            p_u = get_utterance_prob(u, language.utterances,
+                                     language.p_utterances)
+            # S(u|m)
+            s_u_given_m = self.speaker.p_speak(u, m)
+            # L(m|u)
+            l_m_given_u = self.listener.p_listen(u, m)
+            # P_s(u, m)
+            p_joint_speaker = p_m * s_u_given_m
+            # P_l(u, m)
+            p_joint_listener = p_u * l_m_given_u
+            H_s += p_joint_speaker * np.log(p_joint_speaker) \
+                if p_joint_speaker != 0. else 0.
+            H_l += p_joint_listener * np.log(p_joint_listener) \
+                if p_joint_speaker != 0. else 0.
+        H_s *= -1
+        H_l *= -1
+        total = eta * H_s + (1 - eta) * H_l
+
+        return total, H_s, H_l
 
 
 class Semantics:
@@ -140,3 +194,19 @@ class RSAAgent:
         if Z == 0.:
             return 0.
         return listener_score_ / float(Z)
+
+
+if __name__ == '__main__':
+    p_utterances = [0.6, 0.25, 0.1, 0.05]
+    p_meanings = [0.6, 0.25, 0.1, 0.05]
+    sems = idxs2matrix([0, 5, 10, 15], 4, 4)
+    utterances = ['a', 'b', 'c', 'd']
+    meanings = [1, 2, 3, 4]
+    d = matrix2dict(sems, utterances, meanings)
+    sems = Semantics(d)
+    language = Language(utterances, meanings, p_utterances, p_meanings, sems)
+    agent = RSAAgent(language)
+    obj1 = SpeakerListenerCrossEntropy(agent, agent, language)
+    obj2 = FerrerCost(agent, agent, language)
+    print(obj1.compute_cost())
+    print(obj2.compute_cost())
