@@ -12,6 +12,10 @@ def get_meaning_prob(meaning, meanings, meaning_probs):
     return get_item_idx(meaning, meanings, meaning_probs)
 
 
+##############
+# Objectives #
+##############
+
 class Objective:
     """Base klass for objective (cost) functions."""
 
@@ -19,13 +23,14 @@ class Objective:
         self.speaker = speaker
         self.listener = listener
         self.language = language
-        self.events = list(it.product(language.utterances, language.meanings))
+        self.events = list(it.product(self.language.utterances,
+                                      self.language.meanings))
 
     def compute_cost(self):
         raise NotImplementedError()
 
 
-class SpeakerListenerCrossEntropy(Objective):
+class CrossEntropy(Objective):
     """H_c(P_s(u, m), P_l(u, m))"""
 
     def compute_cost(self):
@@ -45,11 +50,13 @@ class SpeakerListenerCrossEntropy(Objective):
         expected_listener_effort = 0.
         for u, m in self.events:
             # meanings prior
-            p_m = get_meaning_prob(m, language.meanings,
-                                   language.p_meanings)
+            p_m = get_meaning_prob(m,
+                                   self.language.meanings,
+                                   self.language.p_meanings)
             # utterances prior
-            p_u = get_utterance_prob(u, language.utterances,
-                                     language.p_utterances)
+            p_u = get_utterance_prob(u,
+                                     self.language.utterances,
+                                     self.language.p_utterances)
             # S(u|m)
             s_u_given_m = self.speaker.p_speak(u, m)
             # L(m|u)
@@ -66,7 +73,7 @@ class SpeakerListenerCrossEntropy(Objective):
         return ce_score, expected_speaker_effort, expected_listener_effort
 
 
-class FerrerCost(Objective):
+class FerrerObjective(Objective):
     """Ferrer-i-cancho entropy objective.
 
     https://www.ncbi.nlm.nih.gov/pmc/articles/PMC298679/pdf/pq0303000788.pdf
@@ -86,11 +93,11 @@ class FerrerCost(Objective):
         H_l = 0.
         for u, m in self.events:
             # meanings prior
-            p_m = get_meaning_prob(m, language.meanings,
-                                   language.p_meanings)
+            p_m = get_meaning_prob(m, self.language.meanings,
+                                   self.language.p_meanings)
             # utterances prior
-            p_u = get_utterance_prob(u, language.utterances,
-                                     language.p_utterances)
+            p_u = get_utterance_prob(u, self.language.utterances,
+                                     self.language.p_utterances)
             # S(u|m)
             s_u_given_m = self.speaker.p_speak(u, m)
             # L(m|u)
@@ -106,9 +113,49 @@ class FerrerCost(Objective):
         H_s *= -1
         H_l *= -1
         total = eta * H_s + (1 - eta) * H_l
-
         return total, H_s, H_l
 
+
+class KL(Objective):
+    """Kullback-Leibler Divergence.
+
+    """
+    def compute_cost(self):
+        """Compute \eta * H_s(u, m) + (1 - \eta) * H_s(u, m)
+
+        Returns
+        -------
+        float
+            KL divergence.
+
+        """
+        KL = 0.
+        for u, m in self.events:
+            # meanings prior
+            p_m = get_meaning_prob(m, self.language.meanings,
+                                   self.language.p_meanings)
+            # utterances prior
+            p_u = get_utterance_prob(u, self.language.utterances,
+                                     self.language.p_utterances)
+            # S(u|m)
+            s_u_given_m = self.speaker.p_speak(u, m)
+            # L(m|u)
+            l_m_given_u = self.listener.p_listen(u, m)
+            # P_s(u, m)
+            p_joint_speaker = p_m * s_u_given_m
+            # P_l(u, m)
+            p_joint_listener = p_u * l_m_given_u
+
+            KL += p_joint_speaker * \
+                  (np.log(p_joint_speaker) - np.log(p_joint_listener)) \
+                if p_joint_listener != 0. else 0.
+
+        return KL
+
+
+############
+# Language #
+############
 
 class Semantics:
     """Literal semantics (adjacency matrix)"""
@@ -133,6 +180,10 @@ class Language:
         self.p_meanings = p_meanings
         self.semantics = semantics
 
+
+#######
+# RSA #
+#######
 
 class RSAAgent:
     """RSA interlocutor."""
@@ -199,14 +250,16 @@ class RSAAgent:
 if __name__ == '__main__':
     p_utterances = [0.6, 0.25, 0.1, 0.05]
     p_meanings = [0.6, 0.25, 0.1, 0.05]
-    sems = idxs2matrix([0, 5, 10, 15], 4, 4)
+    sems = idxs2matrix([0, 4, 5, 10], 4, 4)
     utterances = ['a', 'b', 'c', 'd']
     meanings = [1, 2, 3, 4]
     d = matrix2dict(sems, utterances, meanings)
     sems = Semantics(d)
     language = Language(utterances, meanings, p_utterances, p_meanings, sems)
     agent = RSAAgent(language)
-    obj1 = SpeakerListenerCrossEntropy(agent, agent, language)
-    obj2 = FerrerCost(agent, agent, language)
+    obj1 = CrossEntropy(agent, agent, language)
+    obj2 = FerrerObjective(agent, agent, language)
+    obj3 = KL(agent, agent, language)
     print(obj1.compute_cost())
-    print(obj2.compute_cost())
+    print(obj2.compute_cost(eta=0.4))
+    print(obj3.compute_cost())

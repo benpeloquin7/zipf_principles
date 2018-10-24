@@ -89,6 +89,13 @@ def get_item_idx(item, arr1, arr2):
     try:
         idx = [i for i, x in enumerate(arr1) if x == item][0]
     except:
-        import pdb;
-        pdb.set_trace();
+        raise Exception("Problem indexing into item array.")
     return arr2[idx]
+
+
+def largest_denotation(idxs, n, m):
+    m = idxs2matrix(idxs, n, m)
+    return np.max(np.sum(m, axis=0))
+
+def contains_ambiguities(idxs, n, m):
+    return largest_denotation(idxs, n, m) != 1.
