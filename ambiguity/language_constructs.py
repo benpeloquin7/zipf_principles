@@ -73,6 +73,61 @@ class CrossEntropy(Objective):
         return ce_score, expected_speaker_effort, expected_listener_effort
 
 
+class SymmetricCrossEntropy(Objective):
+    """(speaker -> listener CE) + (listener -> speaker CE)
+
+    \lambda * H_c(P_s(u, m), P_l(u, m)) + \
+            (1-\lambda) H_c(P_l(u, m), P_s(u, m)
+
+    """
+
+    def compute_cost(self, eta=0.5):
+        """
+
+        Returns
+        -------
+        tuple of floats
+            (Cross entropy score, avg speaker effort, avg listener effort)
+
+        """
+        expected_speaker_effort_1 = 0.
+        expected_listener_effort_1 = 0.
+        expected_speaker_effort_2 = 0.
+        expected_listener_effort_2 = 0.
+        for u, m in self.events:
+            # meanings prior
+            p_m = get_meaning_prob(m,
+                                   self.language.meanings,
+                                   self.language.p_meanings)
+            # utterances prior
+            p_u = get_utterance_prob(u,
+                                     self.language.utterances,
+                                     self.language.p_utterances)
+            # S(u|m)
+            s_u_given_m = self.speaker.p_speak(u, m)
+            # L(m|u)
+            l_m_given_u = self.listener.p_listen(u, m)
+            # P_s(u, m)
+            p_joint_speaker = p_m * s_u_given_m
+            # P_l(m, u)
+            p_joint_listener = p_u * l_m_given_u
+
+            expected_speaker_effort_1 += p_joint_speaker * -np.log(p_u)
+            expected_listener_effort_1 += \
+                (p_joint_speaker * -np.log(l_m_given_u)) \
+                    if l_m_given_u != 0. else 0.
+            expected_speaker_effort_2 += p_joint_listener * -np.log(p_m)
+            expected_listener_effort_2 += \
+                (p_joint_listener * -np.log(s_u_given_m)) \
+                    if s_u_given_m != 0. else 0.
+
+        H_s2l = (expected_speaker_effort_1 + expected_listener_effort_1)
+        H_l2s = (expected_speaker_effort_2 + expected_listener_effort_2)
+        interplotated_total = eta * H_s2l + (1 - eta) * H_l2s
+
+        return interplotated_total, H_s2l, H_l2s
+
+
 class FerrerObjective(Objective):
     """Ferrer-i-cancho entropy objective.
 
