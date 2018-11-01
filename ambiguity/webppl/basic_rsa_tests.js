@@ -4,7 +4,7 @@ var meaningPrior = function() {
   return categorical({vs: meanings, ps: [0.1, 0.3, 0.6]})
 }
 var utterancePrior = function() {
-  return categorical({vs: utterances, ps: [0.1, 0.3, 0.9]})
+  return categorical({vs: utterances, ps: [0.1, 0.3, 0.6]})
 }
 
 
@@ -12,7 +12,7 @@ var semantics = function(u, m) {
   var mapper = {
     'a': [1], 
     'b': [1, 2],
-    'c': [3],
+    'c': [2, 3],
   }
   return mapper[u].includes(m)
 }
@@ -25,12 +25,14 @@ var L0 = function(u) {
     return m
   })
 }
+var alpha = 10
+
 
 var S1 = function(m) {
   Infer({method:'enumerate'}, function() {
     var u = utterancePrior()
     var L = L0(u)
-    factor(L.score(m))
+    factor(alpha*L.score(m))
     return u
   })
 }
@@ -44,13 +46,31 @@ var L1 = function(u) {
   })
 }
 
-console.log(S1(1))
-console.log(S1(2))
-console.log(S1(3))
-console.log(Math.exp(L0('a').score(1)))
 console.log(Math.exp(L0('b').score(1)))
 console.log(Math.exp(L0('b').score(2)))
-console.log('====')
-console.log(Math.exp(L1('a').score(1)))
-console.log(Math.exp(L1('b').score(1)))
-console.log(Math.exp(L1('b').score(2)))
+console.log(Math.exp(L0('b').score(3)))
+console.log(Math.exp(L0('c').score(1)))
+console.log(Math.exp(L0('c').score(2)))
+console.log(Math.exp(L0('c').score(3)))
+
+console.log('=======')
+console.log("S1(1).score('a')")
+console.log(Math.exp(S1(1).score('a')))
+console.log("S1(1).score('b')")
+console.log(Math.exp(S1(1).score('b')))
+console.log("S1(1).score('c')")
+console.log(Math.exp(S1(1).score('c')))
+console.log('=======')
+console.log("S1(2).score('a')")
+console.log(Math.exp(S1(2).score('a')))
+console.log("S1(2).score('b')")
+console.log(Math.exp(S1(2).score('b')))
+console.log("S1(2).score('c')")
+console.log(Math.exp(S1(2).score('c')))
+console.log('=======')
+console.log("S1(3).score('a')")
+console.log(Math.exp(S1(3).score('a')))
+console.log("S1(3).score('b')")
+console.log(Math.exp(S1(3).score('b')))
+console.log("S1(3).score('c')")
+console.log(Math.exp(S1(3).score('c')))
