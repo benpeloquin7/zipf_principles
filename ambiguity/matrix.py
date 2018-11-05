@@ -14,13 +14,14 @@ def is_literal(m):
 def row_normalize(m):
     """All rows sum to 1"""
     totals = np.sum(m, axis=1)
-    return (m.transpose() / totals).transpose()
+    M = np.nan_to_num((m.transpose() / totals).transpose())
+    return M
 
 
 def col_normalize(m):
     """All cols sum to 1"""
     totals = np.sum(m, axis=0)
-    return (m / totals)
+    return np.nan_to_num((m / totals))
 
 
 def row_multiply(m, k):

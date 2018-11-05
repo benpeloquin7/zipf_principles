@@ -15,13 +15,19 @@ class Objective:
 
     @staticmethod
     def _check_matrix(m):
-        return np.abs(np.sum(m) - 1) < 1e-3
+        return True
+        #return np.abs(np.sum(m) - 1) < 1e-3
 
     def compute_cost(self, m1, m2):
         raise NotImplementedError()
 
 
 def inf2zero(log_M):
+    """Convert -np.Inf entries to 0.
+
+    Slightly hacky, but useful for information-theoretic
+    costs and divergences like KL and CE.
+    """
     for i, _ in enumerate(log_M):
         for j, _ in enumerate(log_M[i]):
             if log_M[i][j] == -np.Inf:
@@ -31,33 +37,34 @@ def inf2zero(log_M):
 
 class CrossEntropy(Objective):
     def compute_cost(self, m1, m2):
-        assert (self._check_matrix(m1) and self._check_matrix(m2))
-        log_m2 = inf2zero(np.log(m2))
-        return -np.sum(m1 * log_m2)
+        return -np.sum(m1 * inf2zero(np.log(m2)))
+
+    def get_speaker_effort(self, m1, m2):
+        pass
+
+    def get_listener_effort(self, m1, m2):
+        pass
+
 
 
 class KL(Objective):
     def compute_cost(self, m1, m2):
-        assert (self._check_matrix(m1) and self._check_matrix(m2))
         n_rows, n_cols = m1.shape
         total = 0
         for i in range(n_rows):
             for j in range(n_cols):
                 total += m1[i][j] * np.log(m1[i][j] / m2[i][j]) \
                     if m2[i][j] != 0 and m1[i][j] != 0 else 0.
-        # return -np.sum(m1 * np.log(m2 / m1))
         return total
 
 class FerrerObjective(Objective):
     def compute_cost(self, m1, m2):
-        assert (self._check_matrix(m1) and self._check_matrix(m2))
-        return - np.sum(m1 * np.log(m1)) - np.sum(m2 * np.log(m2))
+        return -np.sum(m1 * inf2zero(np.log(m1))) - np.sum(m2 * inf2zero(np.log(m2)))
 
 
 class SymmetricCrossEntropy(Objective):
     def compute_cost(self, m1, m2):
-        assert (self._check_matrix(m1) and self._check_matrix(m2))
-        return -np.sum(m1 * np.log(m2)) - np.sum(m2 * np.log(m1))
+        return -np.sum(m1 * inf2zero(np.log(m2))) - np.sum(m2 * inf2zero(np.log(m1)))
 
 
 if __name__ == '__main__':
@@ -70,7 +77,7 @@ if __name__ == '__main__':
     ferrer = FerrerObjective()
     symmetric_ce = SymmetricCrossEntropy()
 
-    print(ce.compute_cost(m, m))
-    print(kl.compute_cost(m, m))
-    print(ferrer.compute_cost(m, m))
-    print(symmetric_ce.compute_cost(m, m))
+   # print(ce.compute_cost(m, m))
+   # print(kl.compute_cost(m, m))
+   # print(ferrer.compute_cost(m, m))
+   # print(symmetric_ce.compute_cost(m, m))

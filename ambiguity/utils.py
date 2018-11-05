@@ -94,8 +94,8 @@ def get_item_idx(item, arr1, arr2):
 
 
 def largest_denotation(idxs, n, m):
-    m = idxs2matrix(idxs, n, m)
-    return np.max(np.sum(m, axis=0))
+    m_ = idxs2matrix(idxs, n, m)
+    return np.max(np.sum(m_, axis=1))
 
 def contains_ambiguities(idxs, n, m):
     return largest_denotation(idxs, n, m) != 1.
