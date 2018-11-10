@@ -56,8 +56,8 @@ var worldsPrior = function() {return sample(wordsDistr)}
 
 // Utterances
 var utterances = ['a', 'b', 'c', 'd', 'x', 'y']
-// var utteranceWeights = [1, 1, 1, 1, 2, 2]
-var utteranceWeights = repeat(utterances.length, function(x) {1})
+var utteranceWeights = [1, 1, 1, 1, 4, 4]
+// var utteranceWeights = repeat(utterances.length, function(x) {1})
 var utterancesDistr = Categorical({vs:utterances, ps:utteranceWeights})
 var utterancesPrior = function() {return sample(utterancesDistr)}
 
@@ -105,7 +105,7 @@ var utteranceMeaning = function(utterance) {
   }
 }
 
-// P(w|T)
+// P(m|T)
 var sampleWorldFromTopic = cache(function(topicName) {
   return function() {
     if (topicName == 'T1') {
@@ -138,7 +138,8 @@ var cost = function(utterance) {
     'x':   0.1,
     'y':   0.1
   }
-  return costs[utterance]
+//   return costs[utterance]
+  return 0
 }
 
 // RSA agents
@@ -405,11 +406,82 @@ var crossEntropy = function(speaker, listener, data) {
 }
 
 
-var trackCrossEntropies = function(utterances) {
+// KL
+// ==
+// Kullback-Leibler Divergence
+//
+var KL = function(speaker, listener, data) {
+  Infer({method:'enumerate'}, function() {
+    var T = targetDistr
+    // p(m|t)
+    var p_m_given_t = getTopicNameDistr(T)
+    // m ~ p(m|t)
+    var m = sample(p_m_given_t)
+    // S(u|m, d)
+    var p_u_given_m_d = speaker(m, T, data)
+    // u ~ S(u|m, d)
+    var u = sample(p_u_given_m_d)['utterance']
+    // p(m|u, d)
+    var p_m_given_u = listener(u, data)
+    // p(t|d)
+    var p_t_given_d = listenerTopicDistrPosterior(data)
+    // p(u)
+    var p_u = utterancesDistr
+    return (p_u_given_m_d.score({'utterance': u}) + p_m_given_t.score(m)) - 
+      (p_m_given_u.score({'estWorld': m, 'estTopicDistrName': T}) + p_t_given_d.score(T) + p_u.score(u))
+  })
+}
+
+// Speaker cost
+// =============
+// \sum_{u, m}S(u|m)p(m|t)log2(p(u))
+//
+var speakerEffort = function(speaker, listener, data) {
+  Infer({method:'enumerate'}, function() {
+    var T = targetDistr
+    // p(m|t)
+    var p_m_given_t = sampleWorldFromTopic(T)
+    // m ~ p(m|t)
+    var m = p_m_given_t()
+    // S(u|m, d)
+    var p_u_given_m_d = speaker(m, T, data)
+    // u ~ S(u|m, d)
+    var u = sample(p_u_given_m_d)['utterance']
+    // p(u)
+    var p_u = utterancesDistr
+    return p_u.score(u)
+  })
+}
+
+// Listener cost
+// =============
+// \sum_{u, m}S(u|m)p(m|t)log2(L(m|u,d)p(T|d))
+//
+var listenerEffort = function(speaker, listener, data) {
+  Infer({method:'enumerate'}, function() {
+    var T = targetDistr
+    // p(m|t)
+    var p_m_given_t = sampleWorldFromTopic(T)
+    // m ~ p(m|t)
+    var m = p_m_given_t()
+    // S(u|m, d)
+    var p_u_given_m_d = speaker(m, T, data)
+    // u ~ S(u|m, d)
+    var u = sample(p_u_given_m_d)['utterance']
+    // p(m|u, d)
+    var p_m_given_u = listener(u, data)
+    // p(t|d)
+    var p_t_given_d = listenerTopicDistrPosterior(data)
+    return p_m_given_u.score({'estWorld': m, 'estTopicDistrName': T}) + p_t_given_d.score(T)
+      
+  })
+}
+
+var trackObjective = function(objective, utterances) {
   var res = map(function(x) {    
-    return expectation(crossEntropy(SDiscourseAware, 
-                                    LDiscourseAware, 
-                                    utterances.slice(x[0], x[1])))
+    return expectation(objective(SDiscourseAware, 
+                                  LDiscourseAware, 
+                                  utterances.slice(x[0], x[1])))
   }, contextSlices)
   return res
 }
@@ -436,7 +508,12 @@ var getListenerInferences = function(utterances) {
 // Return a list of dictionaries containing speaker utterance data
 // and corresponding state of listener inferences about topics.
 //
-var processUtterances = function(speakerData, listenerInferences, crossEntropies, crossEntropies2) {
+var processUtterances = function(speakerData, 
+                                  listenerInferences, 
+                                  crossEntropies, 
+                                  kls, 
+                                  listenerCosts,
+                                  speakerCosts) {
   var dMap = map(function(x) {
     return {
       'utteranceNum': x, 
@@ -445,7 +522,10 @@ var processUtterances = function(speakerData, listenerInferences, crossEntropies
       'T2': listenerInferences[x]['T2'],
       'T3': listenerInferences[x]['T3'],
       'T4': listenerInferences[x]['T4'],
-      'CE': crossEntropies[x]}
+      'CE': crossEntropies[x],
+      'KL': kls[x],
+      'listenerCosts': listenerCosts[x],
+      'speakerCosts': speakerCosts[x]}
   }, dataSizes)
   return dMap
 }
@@ -468,8 +548,11 @@ var runFn = function(resultType) {
   if (resultType == 'contextAware') {
     var utteranceList = speakerRecurse(targetDistr, [], nUtterances)
     var listenerInferences = getListenerInferences(utteranceList)
-    var crossEntropies = trackCrossEntropies(utteranceList)
-    return processUtterances(utteranceList, listenerInferences, crossEntropies)
+    var crossEntropies = trackObjective(crossEntropy, utteranceList)
+    var KLs = trackObjective(KL, utteranceList)
+    var listenerCosts = trackObjective(listenerEffort, utteranceList)
+    var speakerCosts = trackObjective(speakerEffort, utteranceList)
+    return processUtterances(utteranceList, listenerInferences, crossEntropies, KLs, listenerCosts, speakerCosts)
   }
   // Comparison model 1 - Speaker never reasons about discrouse
   else if (resultType == 'contextUnaware') {
@@ -499,4 +582,4 @@ var runFn = function(resultType) {
 // 
 // run
 //
-runFn(resultType)
+runFn('contextAware')
