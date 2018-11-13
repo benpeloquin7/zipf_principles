@@ -364,7 +364,7 @@ class RecursiveSimulation(Simulation):
                             listener(m, p_utterances, p_meanings_, 1., k)
                         # Note we assume uniform over contexts
                         # thus (1 / len(n_contexts))
-                        if idxs in d_results:
+                        if key in d_results:
                             d_results[key]['ce'] += \
                                 ce.compute_cost(m_speaker, m_listener) * \
                                 (1. / n_contexts)
@@ -384,7 +384,7 @@ class RecursiveSimulation(Simulation):
                                 ce.compute_cost(m_speaker,
                                                 m_simple_listener_costs) * \
                                 (1. / n_contexts)
-                            d_results[idxs]['base_speaker_listener_ce'] += \
+                            d_results[key]['base_speaker_listener_ce'] += \
                                 ce.compute_cost(m_speaker_no_context,
                                                 m_listener_no_context) * \
                                 (1. / n_contexts)
@@ -409,7 +409,7 @@ class RecursiveSimulation(Simulation):
                                 ce.compute_cost(m_speaker,
                                                 m_simple_listener_costs) * \
                                 (1. / n_contexts)
-                            d_results[idxs]['base_speaker_listener_ce'] = \
+                            d_results[key]['base_speaker_listener_ce'] = \
                                 ce.compute_cost(m_speaker_no_context,
                                                 m_listener_no_context) * \
                                 (1. / n_contexts)
@@ -435,6 +435,7 @@ class RecursiveSimulation(Simulation):
             min_sym_ce = np.Inf
             min_speaker_entropy = np.Inf
             min_listener_entropy = np.Inf
+            min_base_ce = np.Inf
             for idxs, results in d_results.items():
                 if results['ce'] < min_ce:
                     min_ce = results['ce']
@@ -477,4 +478,15 @@ class RecursiveSimulation(Simulation):
             all_results.append(d_results)
             pbar.update()
         pbar.close()
-        return all_results
+
+        d_all_results = self.process_results(all_results)
+        return pd.DataFrame(d_all_results)
+
+    def process_results(self, d):
+        d_results = []
+        for x in d:
+            for idxs, vals in x.items():
+                curr_d = vals
+                curr_d['idxs'] = idxs
+                d_results.append(curr_d)
+        return d_results
