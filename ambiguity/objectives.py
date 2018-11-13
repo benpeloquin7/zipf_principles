@@ -46,7 +46,6 @@ class CrossEntropy(Objective):
         pass
 
 
-
 class KL(Objective):
     def compute_cost(self, m1, m2):
         n_rows, n_cols = m1.shape
@@ -57,6 +56,7 @@ class KL(Objective):
                     if m2[i][j] != 0 and m1[i][j] != 0 else 0.
         return total
 
+
 class FerrerObjective(Objective):
     def compute_cost(self, m1, m2):
         return -np.sum(m1 * inf2zero(np.log(m1))) - np.sum(m2 * inf2zero(np.log(m2)))
@@ -65,6 +65,11 @@ class FerrerObjective(Objective):
 class SymmetricCrossEntropy(Objective):
     def compute_cost(self, m1, m2):
         return -np.sum(m1 * inf2zero(np.log(m2))) - np.sum(m2 * inf2zero(np.log(m1)))
+
+
+class SingleEntropy(Objective):
+    def compute_cost(self, m):
+        return -np.sum(m * inf2zero(np.log(m)))
 
 
 if __name__ == '__main__':
