@@ -73,14 +73,15 @@ def generate_all_boolean_matrices(m, n, n_true):
     return matrices
 
 
-def matrix2dict(M, utterances, meanings):
+def matrix2idxs(M):
     """Rows correspond to utterances, Cols correspond to meanings."""
-    assert M.shape[0] == len(utterances) and M.shape[1] == len(meanings)
+    # assert M.shape[0] == len(utterances) and M.shape[1] == len(meanings)
     d = defaultdict(list)
+    d = []
     for row in range(M.shape[0]):
         for col in range(M.shape[1]):
             if M[row][col] != 0.:
-                d[utterances[row]].append(meanings[col])
+                d.append(row + col)
     return d
 
 
@@ -96,6 +97,7 @@ def get_item_idx(item, arr1, arr2):
 def largest_denotation(idxs, n, m):
     m_ = idxs2matrix(idxs, n, m)
     return np.max(np.sum(m_, axis=1))
+
 
 def contains_ambiguities(idxs, n, m):
     return largest_denotation(idxs, n, m) != 1.
