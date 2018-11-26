@@ -8,6 +8,9 @@ import numpy as np
 logging.getLogger().setLevel(logging.INFO)
 
 
+def normalize_m(m):
+    return m / np.sum(m)
+
 def all_meanings_available_filter(M):
     """
 
@@ -76,7 +79,6 @@ def generate_all_boolean_matrices(m, n, n_true):
 def matrix2idxs(M):
     """Rows correspond to utterances, Cols correspond to meanings."""
     # assert M.shape[0] == len(utterances) and M.shape[1] == len(meanings)
-    d = defaultdict(list)
     d = []
     for row in range(M.shape[0]):
         for col in range(M.shape[1]):

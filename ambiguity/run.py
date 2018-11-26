@@ -2,6 +2,11 @@
 
 Run a single simulation specified in config.py
 
+Example
+-------
+
+>>> python -m ambiguity.run --sim-type context --out-dir
+
 """
 
 import os
