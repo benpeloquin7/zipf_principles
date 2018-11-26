@@ -96,8 +96,10 @@ class OrderedSimulation(Simulation):
             for idxs, m in all_matrices:
                 for context_id, context in enumerate(contexts):
                     p_meanings_ = context
+                    # Pragmatic speaker / listener
                     m_speaker = col_multiply(speaker(m, p_utterances, p_meanings_, 1., speaker_k), p_meanings_)
                     m_listener = row_multiply(listener(m, p_utterances, p_meanings_, 1., listener_k), p_utterances)
+                    # non-Pragmatic speaker / listener
                     m_speaker_no_context = col_multiply(speaker(m, p_utterances, p_m_no_context, 1., speaker_k), p_m_no_context)
                     m_listener_no_context = row_multiply(listener(m, p_utterances, p_m_no_context, 1., listener_k), p_utterances)
                     # For computing log(p(u)) in \sum_{u, m}P_s(u, m)*log(p(u))
@@ -107,48 +109,62 @@ class OrderedSimulation(Simulation):
 
                     # Note we assume uniform prior over contexts
                     # thus (1 / len(n_contexts))
+                    p_c = (1. / n_contexts)
                     if idxs in d_results:
+                        # Normalise to ensure valid probability distributions.
+                        # (handle languages that have assigned
+                        # 0 to particular utterance.)
+                        m_speaker = normalize_m(m_speaker)
+                        m_listener = normalize_m(m_listener)
+                        m_speaker_no_context = normalize_m(m_speaker_no_context)
+                        m_listener_no_context = normalize_m(m_listener_no_context)
+
+                        # compute costs
                         d_results[idxs]['ce'] += \
-                            ce.compute_cost(m_speaker, m_listener) *  \
-                            (1. / n_contexts)
+                            ce.compute_cost(m_speaker, m_listener) * \
+                            p_c
                         d_results[idxs]['kl'] += \
                             kl.compute_cost(m_speaker, m_listener) * \
-                            (1. / n_contexts)
+                            p_c
                         d_results[idxs]['ferrer'] += \
-                            ferrer.compute_cost(m_speaker, m_listener) \
-                            * (1. / n_contexts)
+                            ferrer.compute_cost(m_speaker, m_listener) * \
+                            p_c
                         d_results[idxs]['sym_ce'] += \
-                            sym_ce.compute_cost(m_speaker, m_listener) \
-                            * (1. / n_contexts)
+                            sym_ce.compute_cost(m_speaker, m_listener) * \
+                            p_c
                         d_results[idxs]['speaker_entropy'] += \
-                            ce.compute_cost(m_speaker, m_simple_speaker_costs) \
-                            * (1. / n_contexts)
+                            ce.compute_cost(m_speaker, m_simple_speaker_costs) * \
+                            p_c
                         d_results[idxs]['listener_entropy'] += \
                             ce.compute_cost(m_speaker, m_simple_listener_costs) * \
-                            (1. / n_contexts)
+                            p_c
                         d_results[idxs]['base_speaker_listener_ce'] += \
-                            ce.compute_cost(m_speaker_no_context, m_listener_no_context) * (1. / n_contexts)
+                            ce.compute_cost(m_speaker_no_context, m_listener_no_context) * \
+                            p_c
                     else:
+                        # Set initial values
                         d_results[idxs]['ce'] = \
                             ce.compute_cost(m_speaker, m_listener) * \
-                            (1. / n_contexts)
+                            p_c
                         d_results[idxs]['kl'] = \
                             kl.compute_cost(m_speaker, m_listener) * \
-                            (1. / n_contexts)
+                            p_c
                         d_results[idxs]['ferrer'] = \
                             ferrer.compute_cost(m_speaker, m_listener) * \
-                            (1. / n_contexts)
+                            p_c
                         d_results[idxs]['sym_ce'] = \
                             sym_ce.compute_cost(m_speaker, m_listener) * \
-                            (1. / n_contexts)
+                            p_c
                         d_results[idxs]['speaker_entropy'] = \
                             ce.compute_cost(m_speaker, m_simple_speaker_costs) * \
-                                (1. / n_contexts)
+                            p_c
                         d_results[idxs]['listener_entropy'] = \
                             ce.compute_cost(m_speaker, m_simple_listener_costs) * \
-                            (1. / n_contexts)
+                            p_c
                         d_results[idxs]['base_speaker_listener_ce'] = \
-                            ce.compute_cost(m_speaker_no_context, m_listener_no_context) * (1. / n_contexts)
+                            ce.compute_cost(m_speaker_no_context, m_listener_no_context) * \
+                            p_c
+                        # Tracking meta-data
                         d_results[idxs]['sim_id'] = sim_id
                         d_results[idxs]['contains_ambiguity'] = contains_ambiguities(idxs, N_UTTERANCES, N_MEANINGS)
                         d_results[idxs]['n_contexts'] = len(contexts)
@@ -362,67 +378,68 @@ class RecursiveSimulation(Simulation):
                         # For computing \sum_{u, m}P_s(u, m)*log(L(m|u))
                         m_simple_listener_costs = \
                             listener(m, p_utterances, p_meanings_, 1., k)
-                        # Note we assume uniform over contexts
-                        # thus (1 / len(n_contexts))
+
+                        # Normalise to ensure valid probability distributions.
+                        # (handle languages that have assigned
+                        # 0 to particular utterance.)
+                        m_speaker = normalize_m(m_speaker)
+                        m_listener = normalize_m(m_listener)
+                        m_speaker_no_context = normalize_m(m_speaker_no_context)
+                        m_listener_no_context = normalize_m(m_listener_no_context)
+
+                        p_c = (1. / n_contexts)
                         if key in d_results:
                             d_results[key]['ce'] += \
                                 ce.compute_cost(m_speaker, m_listener) * \
-                                (1. / n_contexts)
+                                p_c
                             d_results[key]['kl'] += \
                                 kl.compute_cost(m_speaker, m_listener) * \
-                                (1. / n_contexts)
+                                p_c
                             d_results[key]['ferrer'] += \
-                                ferrer.compute_cost(m_speaker, m_listener) \
-                                * (1. / n_contexts)
+                                ferrer.compute_cost(m_speaker, m_listener) * \
+                                p_c
                             d_results[key]['sym_ce'] += \
-                                sym_ce.compute_cost(m_speaker, m_listener) \
-                                * (1. / n_contexts)
+                                sym_ce.compute_cost(m_speaker, m_listener) * \
+                                p_c
                             d_results[key]['speaker_entropy'] += \
-                                ce.compute_cost(m_speaker, m_simple_speaker_costs) \
-                                * (1. / n_contexts)
+                                ce.compute_cost(m_speaker, m_simple_speaker_costs) * \
+                                p_c
                             d_results[key]['listener_entropy'] += \
-                                ce.compute_cost(m_speaker,
-                                                m_simple_listener_costs) * \
-                                (1. / n_contexts)
+                                ce.compute_cost(m_speaker, m_simple_listener_costs) * \
+                                p_c
                             d_results[key]['base_speaker_listener_ce'] += \
-                                ce.compute_cost(m_speaker_no_context,
-                                                m_listener_no_context) * \
-                                (1. / n_contexts)
+                                ce.compute_cost(m_speaker_no_context, m_listener_no_context) * \
+                                p_c
                         else:
                             d_results[key]['ce'] = \
                                 ce.compute_cost(m_speaker, m_listener) * \
-                                (1. / n_contexts)
+                                p_c
                             d_results[key]['kl'] = \
                                 kl.compute_cost(m_speaker, m_listener) * \
-                                (1. / n_contexts)
+                                p_c
                             d_results[key]['ferrer'] = \
                                 ferrer.compute_cost(m_speaker, m_listener) * \
-                                (1. / n_contexts)
+                                p_c
                             d_results[key]['sym_ce'] = \
                                 sym_ce.compute_cost(m_speaker, m_listener) * \
-                                (1. / n_contexts)
+                                p_c
                             d_results[key]['speaker_entropy'] = \
-                                ce.compute_cost(m_speaker,
-                                                m_simple_speaker_costs) * \
-                                (1. / n_contexts)
+                                ce.compute_cost(m_speaker, m_simple_speaker_costs) * \
+                                p_c
                             d_results[key]['listener_entropy'] = \
-                                ce.compute_cost(m_speaker,
-                                                m_simple_listener_costs) * \
-                                (1. / n_contexts)
+                                ce.compute_cost(m_speaker, m_simple_listener_costs) * \
+                                p_c
                             d_results[key]['base_speaker_listener_ce'] = \
-                                ce.compute_cost(m_speaker_no_context,
-                                                m_listener_no_context) * \
-                                (1. / n_contexts)
+                                ce.compute_cost(m_speaker_no_context, m_listener_no_context) * \
+                                p_c
                             d_results[key]['sim_id'] = sim_id
-                            d_results[key][
-                                'contains_ambiguity'] = contains_ambiguities(idxs,
-                                                                             N_UTTERANCES,
-                                                                             N_MEANINGS)
+                            d_results[key]['contains_ambiguity'] = \
+                                contains_ambiguities(idxs, N_UTTERANCES, N_MEANINGS)
                             d_results[key]['n_contexts'] = len(contexts)
-                            d_results[key][
-                                'utterance_order_fn_name'] = utterance_order_fn_name
-                            d_results[key][
-                                'meaning_order_fn_name'] = meaning_order_fn_name
+                            d_results[key]['utterance_order_fn_name'] = \
+                                utterance_order_fn_name
+                            d_results[key]['meaning_order_fn_name'] = \
+                                meaning_order_fn_name
                             d_results[key]['speaker_k'] = k
                             d_results[key]['listener_k'] = k
                             d_results[key]['n_utterances'] = N_UTTERANCES
