@@ -1,0 +1,432 @@
+---
+title: "The interactions of rational pragmatic agents provide a framework for understanding efficient language structure and use"
+bibliography: library.bib
+csl: apa6.csl
+document-params: "10pt, letterpaper"
+
+author-information: > 
+    \author{{\large \bf Author 1} \\ \texttt{bpeloqui@stanford.edu} \\ Department of Psychology \\ Stanford University
+    \And {\large \bf Author 2} \\ \texttt{author1@university.edu} \\ Department of Psychology \\ Some University}
+
+abstract: 
+    We discuss a framework for studying the distributional properties of linguistic systems as emerging from in-the-moment interactions of speakers and listeners. Our work takes Zipfian notions of lexicon-level efficiency as a starting point, connecting these ideas to Gricean notions of conversational-level efficiency. To do so, we begin by deriving an objective function for measuring the communicative efficiency of linguistic systems and then examining the behavior of this objective in a series of simulations focusing on the communicative function of ambiguity in language.
+
+    
+keywords:
+    "Communicaive efficiency, Rational Speech Act theory, computational modeling, information theory, agent-based simulation"
+    
+output: cogsci2016::cogsci_paper
+---
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(fig.width=3, fig.height=3, fig.crop = F, fig.pos = "tb", fig.path='figs/',
+                      echo=F, warning=F, cache=F, message=F, sanitize = T)
+```
+
+```{r, libraries}
+library(png)
+library(grid)
+library(ggplot2)
+library(xtable)
+```
+
+# Introduction
+Why do natural languages look they way they do? Functionalist approaches to language science bring a utility-based perspective to this question, typically reframing it in terms of information-theoretic principles of efficiency -- how does having property $x$ make using language $\ell$ more or less useful for communication? This family of theories has described a range of phenomena in language-design (compositionality, ambiguity, dependency length) and language-use (redundancy and reduction) in terms of communicative efficiency. Consider two examples of such theories: Piantadosi et al. (2012) argued that efficiently *designed* linguistic systems will contain ambiguous lexical items when communication is contextualized. If words with multiple meanings can be disambiguated in context, less costly forms can be re-used efficiently.  From the language *use* perspective, Levy & Jaeger (2007) showed that speakers are sensitive to spikes and troughs in the information rate of their utterances. The authors showed that speakers modulate use of optional material according to the surprisal of oncoming material -- an optimal strategy for efficient information transfer from an information-theoretic analysis.\par
+
+While Piantadosi et al. (2012) and Levy & Jaeger (2007) provide two recent examples of functionalist theory, these frameworks are largely in line with earlier work by Zipf (1949). Zipf's Principle of Least Effort is a domain-general framework for describing human behavior in terms of effort minimization. Zipf claimed that humans have a preference to minimize "the average rate of work-expenditure over time" (Zipf, 1949, p.6). In terms of language behavior, he described a relation between a word's frequency in corpora and its length (number of characters) in terms of the principle of least effort. Intuitively, if effort is related to a word’s length (perhaps via articulatory effort) then, holding all else constant, a language with shorter words should be more efficient than a language with longer words, what Zipf called the *Law of Abbreviation*. Indeed this relation between frequency and length is well-documented in natural languages (Kanwal et al 2017).\par
+
+Perhaps even more important than the actual predictions made by Zipf’s Principle of Least Effort is the insight that we can analyse the structure of language systems in terms *effort* or *cost* along competing dimensions.  With such a formulation we can begin to ask questions about what optimal languages might look like under different cost structures. For example, Zipf noted that purely from the standpoint of speaker effort, what Zipf called "Speaker's Economy," an optimal language $\ell_{speaker}^*$ would tend toward a vocabulary of just a single, low-cost word. Given such a language, the full set of potential meanings would be conveyed using only that word, i.e. $\ell_{speaker}^*$ would be fully ambiguous and all possible meanings would need to be disambiguated by a listener. Conversely, from the standpoint of listener effort, what Zipf called "Auditor's Economy," an optimal language $\ell_{listener}^*$ would bijectively map all possible meanings to distinct words, eliminating a listener's need to disambiguate. Under this analysis, speaker effort is related to production cost and listener effort to understanding (disambiguation) cost. Clearly natural languages fall between the two extremes of $\ell_{speaker}^*$ and $\ell_{listener}^*$. Zipf's insight was that the particular distributional properties we observe in natural languages emerge from the competition of these forces -- the pressure to jointly minimize speaker and listener effort.\par
+
+Zipf’s principle of least effort and its speaker and listener instantations were intended as a framework for explaining all of natural language. However, Zipf’s primary unit of analysis was at the level of languages themselves (i.e. the vocabulary). Subsequent work by Horn (1984), highlighted the importance of Zipf’s principles for explaining phenomena at the level of a single conversation. Horn suggested a direct link between Zipf’s Speaker and Listener economy and, what was at the time, more recent work on conversational pragmatics by Grice (1975). Horn highlighted that the interaction of Zipf’s forces were “largely responsible for generating Grice’s conversational maxims and the schema for pragmatic inference derived therefrom.” Put differently, system-level efficiency we see in languages is deeply related to local-level efficiency during the in-the-moment interactions of speakers and listeners. \par
+
+In this work we present an initial step toward formalizing this connection first highlighted by Horn. That is, we present a framework for evaluating the aggregate, distributional properties of linguistic systems as emerging from the accumulation of many in-the-moment interactions of pragmatic speaker and listener agents. We are exploring the questions - to what extent can we connect the Gricean and Zipfian programs in a single framework? To do so, we adopt a simulation-based approach, modeling communication as reference games in which we can vary the types of agents and languages present. This framework allows us to investigate a range of functionalist theories broadly under the categories of efficient language design and language use. \par
+
+For this particular project we focus on an analysis of the communicative function of ambiguity in language following work by Piantadosi et al. (2012). We adopt this particular linguistic phenomena to demonstrate the extent to which we can explore both the design- and use- based functionalist ideas. We focus on three questions -- (1) when is it desirable to have a language with lexical ambiguity? (2) Under what circumstances do speakers and listeners use ambiguity efficiently? (3) Assuming Gricean agents what is the impact of increasing pragmatics on efficiency?\par
+
+We begin with a high-level introduction to the modelling framework introducing the basic ingredients we will need to represent language as repeated reference games. Following this introduction we derive a simple objective function for measuring the efficiency of linguistics systems in this setting. Subsequently, we move on to three case-studies examining the questions posed above, framing results in terms of our efficiency measure.
+
+# Exploring efficient language- design and use in rational pragmatic agents
+
+## Simulation set-up.
+
+### Reference games
+We take as our unit of analysis the basic referential communication game similar to those described by WittgensteIn (CITATION). Both speakers and listeners are aware of a set of objects $M$, which will refer to as *meanings* and are knowledgeable about the set of possible signals $U$ (*utterances*) that could be used to refer to a given meaning. Utterances may have different relative costs, operationalized via a prior over utterances $p(u)$. Similarly, meanings differ in the degree to which they need to be talked about. This is operationalized as a prior over meanings $p(m)$. Note that the prior over meanings are analogous to the *need probabilities* assumed in previous work (Regier, CITATION). We consider a set of contexts $C$ which describe different need probability distributions over our set of meanings $p(m|c)$.
+
+### Languages
+A language $\ell$ defines the set of semantic mappings between utterance and meanings. For example, in a world with three utterances $U = \{u_1, u_2, u_3\} \text{and three meanings }M = \{m_1, m_2, m_3\}$ the boolean matrix 
+
+\begin{center}
+\begin{tabular}{ c | c c c } 
+& $m_1$ & $m_2$ & $m_3$ \\
+\hline
+$u_1$ & 1 & 1 & 0 \\
+$u_2$ & 0 & 1 & 0 \\
+$u_3$ & 0 & 0 & 1 \\
+\end{tabular}
+\end{center}
+
+describes the literal semantics of $\ell$. E.g. the language describes semantic mappings $[[u_1]]\ = \{m_1, m_2\}, [[u_2]]\ = \{m_2\}, [[u_3]]\ = \{m_3\}$.
+
+### Speakers and listeners
+A *speaker agent* defines a conditional distribution over utterances, mapping from intended meanings $M$ to utterances $U$ using a particular semantic mapping given by $\ell$. That is, a speaker defines $P_{speaker}(u|m;\ell)$. We will use $S(u|m;\ell)$ as short-hand throughout.  A *listener agent* defines a conditional distribution over meanings, mapping from utterances $U$ to meanings $M$ using a particular semantic mapping given by $\ell$. We will use $L(m|u; \ell)$ as shorthand. Note that both speakers and listeners can induce joint distributions over the set of all signaling events $E$, although, importantly, these distributions may differ:
+$$P_{speaker}(u, m; \ell) = S(u|m; \ell)p(m)$$
+$$P_{listener}(u, m; \ell) = L(m|u; \ell)p(u)$$
+
+In general, we would like to consider the efficiency of a system $\ell$ in terms of these joint distributions.
+
+
+# Zipfian objective for linguistic system efficiency
+
+## Metrics for optimal linguistic systems in the reference game setting
+
+To assess the optimality of a linguistic system we need some measure of goodness. In other words an objective function, which, as a function of the particular linguistic system $\ell$ and the speaker $S$ and listener $L$ agents returns a measure of the system efficiency ( $f(S, L, \ell) \rightarrow \mathbb{R}$).  For our purposes we’d like to tie this objective to fundamental principles of speaker and listener effort suggested by Zipf. Additionally, we will take the fundamental unit of analysis as the reference game event. \par
+We now derive a simple objective function from Zipfian first principles. Zipf proposed that the particular distributional properties found in natural language emerge as a result of competing speaker and listener pressures. We operationalize this in equation (1) -- the efficiency of a linguistic system $\ell$ being used by speaker and listener agents $S$ and $L$ is sum of the expected speaker and listener effort to communicate.
+\begin{equation}
+\text{Efficiency}(\ell) = \mathbb{E}_{e \in E}[\text{speaker effort}] + \\ \mathbb{E}_{e \in E}[\text{listener effort}]
+\end{equation}
+
+Let speaker effort be the log probability of a particular utterance. $log_2(p(u))$ E.g. the number of bits needed to encode the utterance $u$.
+
+$$\text{speaker effort} = -log_2(p(u))$$
+
+Let listener effort be the log probability a listener disambiguates an intended meaning $m$ given an utterance $u$ E.g. the number of guesses a listener would need to discover the intended meaning $m$ given an utterance $u$.
+$$\text{listener effort} = -log_2(L(m|u; \ell))$$
+
+Rewriting (1) we now have
+\begin{equation}
+= \mathbb{E}_{e \in E}[-log_2(p(u))] + \\
+\mathbb{E}_{e \in E}[-log_2(L(m|u; \ell))]
+\end{equation}
+In general, these expectations are each taken over all possible communicative events $e\in E$ weighted by the probability of a particular event $p(e)$. Recall that is the set of all utterance, meaning pairs $<u, m> = e \in E$.
+
+\begin{equation}
+ = \sum_{e \in E}p(e)[-log_2(p(u))] + \sum_{e \in E}p(e)[-log_2(L(m|u; \ell))]
+\end{equation}
+
+We assume that the particular joint distribution over $u, m$ pairs follows from a simple generative model. First, some meaning is sampled with probability $p(m)$. Our speaker attempts to convey this intended meaning to a speaker by encoding it in the utterance $u$ via the conditional $S(u|m; \ell)$. Combining these terms leads to the *speaker's joint distribution over events* which we can write as $P_{Speaker}(u, m; \ell) = S(u | m; \ell)p(m)$.
+
+\begin{equation}
+\begin{split}
+  = \sum_{u, m}p_{speaker}(u, m; \ell)[-log_2(p(u))] + \\ 
+   \sum_{u, m}p_{speaker}(u, m; \ell)[-log_2(L(m|u; \ell))]
+\end{split}
+\end{equation}
+
+Simplifying we arrive at (5):
+\begin{equation}
+\begin{split}
+ = \sum_{u, m}P_{speaker}(u, m; \ell)[-log_2(L(m|u; \ell)p(u))]
+ \end{split}
+\end{equation}
+
+Note that $L(m|u; \ell)p(u)$ is the listener-based joint distribution over all communicative events ($P_{listener}(u, m; \ell)$).
+\begin{equation}
+  = \sum_{u, m}P_{speaker}(u, m; \ell)[-log_2(P_{listener}(u, m; \ell))]
+\end{equation}
+This is the simply the cross-entropy between the speaker an listener joint distributions.
+\begin{equation}
+\begin{split}
+  = \mathbb{E}_{P_{speaker}}[-log_2(P_{listener})] \\
+  = H_{cross}(P_{speaker}, P_{listener})
+\end{split}
+\end{equation}
+From a mathematical standpoint this objective is intuitive. An optimal linguistic system being used by a speaker and listener agent will induce a particular set of form-meaning mappings that are both *close* between speaker and listener agents and *peaky* in that they assign non-uniform probability mass to the valid form-meaning mappings.
+
+# Three case-studies on efficient language use and design
+We now have a metric for exploring questions of langauge optimality in the reference game setting (the speaker-listener cross-entropy). In the following sections we examine the behavior of the objective with respect to the communicative function of ambiguity. In particular, we examine three questions. The first is a question of optimal design -- given a set of possible languages $L$ in what circumstances does the optimal languages $\ell^*$ contain ambiguity? The second is a question of optimal *use* -- give a particular language that theoretically allows for the use of ambiguious material under what circumstances will ambiguous forms be used efficiently?
+
+## Experiment 1:  Rational-pragmatic speakers prefer languages with ambiguous items
+
+Piantadosi et al. (2012) proposed that a language with ambiguous items is strictly more efficient than a language with out, *when ambiguous items can be disambiguated with context*. Formally, they authors highlighted the fact that if we measure the efficiency of a linguistic system in terms of entropy, we have the basic result from (information theory citation) that the conditional entropy of an ensemble is strictly less that the unconditional entropy, when the information we condition on is informative ($H(X|C) < H(X)$).\par
+
+Piantadosi et al. (2012) provided empirical evidence for this claim, showing (SAY WHAT PIANTADOSI DID). We consider their basic arguemnt in the reference game setting. Our approach procceds as follows, we consider the full-space of valid languages (semantic mappings) between forms and utterances in which $|U|=|M|=4$. A language $\ell \in L$ is "valid" so long as each possible meaning in $m \in M$ can be referred to by at least one form $u \in U$ (every column of $\ell$ has some non-zero assigment). For example, a one word language that is fully ambiguous would map a single form to all possible meanings. We represent that via the boolean matrix $\ell_1$ in which $[[u_1]] = \{m_1,m_2, m_3 \}, [[u_2]]=[[u_3]]=\{\}$
+
+\begin{center}
+\begin{tabular}{ c | c c c} 
+& $m_1$ & $m_2$ & $m_3$ \\
+\hline
+$u_1$ & 1 & 1 & 1 \\
+$u_2$ & 0 & 0 & 0 \\
+$u_3$ & 0 & 0 & 0 \\
+\end{tabular}
+\end{center}
+
+Note that $\mathbb{E}[\text{speaker effort}]$ can be arbitrarily low for such a language, as it is directly proportional to $p(u_1)$. That is in the single utterance language, $\mathbb{E}[\text{speaker effort}] \rightarrow 0$ as $p(u_1) \rightarrow 1$. However, $\mathbb{E}[\text{listener effort}]$ is likely to be high as the only available form ($u_1$) is full ambiguous between possible meanings.\par
+By contrast consider a language $\ell_2$:
+
+\begin{center}
+\begin{tabular}{ c | c c c} 
+& $m_1$ & $m_2$ & $m_3$ \\
+\hline
+$u_1$ & 1 & 0 & 0 \\
+$u_2$ & 0 & 1 & 0 \\
+$u_3$ & 0 & 0 & 1 \\
+\end{tabular}
+\end{center}
+
+In this case $\mathbb{E}[\text{listener effort}]=0$ -- each form has a one-to-one mapping to a given meaning. However speaker effort will likely be greater than in $\ell_1$ so long as $p(u_1) < p(u_2)$ and $p(u_1) < p(u_3)$.
+
+Finally, consider a langauge $\ell_3$:
+
+\begin{center}
+\begin{tabular}{ c | c c c} 
+& $m_1$ & $m_2$ & $m_3$ \\
+\hline
+$u_1$ & 1 & 1 & 0 \\
+$u_2$ & 0 & 0 & 0 \\
+$u_3$ & 0 & 0 & 1 \\
+\end{tabular}
+\end{center}
+
+Our third language contains an ambiguous lexical item - $u_1$ can be used to refer to either $m_1$ or $m_2$. This language represents a trade-off between $\ell_1$ and $\ell_2$. From the speaker perspective $\ell_3$ likely requires more effort from the speaker than $\ell_1$, however it likely requires less than $\ell_2$ (so long as $p(u_1)$ is cheap). From the listener perspective $\ell_3$ requires more effort than $\ell_3$ which requires no disambiguation, but less than $\ell_1$. \par
+As this small set of languages demonstrate, the efficiency of a particular language depends on both utterances costs $P(u)$ and need probabilities $P(M)$. E.g. If $u_1$ is actually a costly utterance ($p(u_1)$ is close to 0) then $\ell_1$ is inefficient both for the speaker and listener. For this reason, in the following simulations, we randomly sample utterance costs $P(u)$ and need probabilities $P(m)$. Our simulations procced as follows. For $n=100$ simulations we enumerate all valid langauges ($4\times 4$ boolean matrices) as well as a set of need probabilities ($p(m)$) and utterance costs ($p(u)$).
+
+Given this set-up we can find the optimal language:
+
+$$\ell^* = \text{argmin}_{\ell \in L} H_{Cross}(P_{Speaker}(u, m; \ell), P_{Listener}(u, m; \ell))$$
+
+Critical to Piantadosi's claim, however is the fact that ambiguous langauges should be preferred *when* context is disambiguating. For that reason we compare the optimal langauge $\ell^*$ as the amount of contextual information increases. In our case a "context" describes a conditional distribution over meanings. For example, take a setting with two contexts $c_1$ and $c_2$. The first context dictates a set of need probabilites which differs from the second ($p(m|c_1) \neq p(m|c_2)$). If ambiguity is useful when context is disambiguating we should expect the likelihood that an optimal langauge $\ell^*$ contains an ambiguous item to increase as the number of contexts increases.
+
+### Simulation set-up. \newline
+
+$L = \text{set of all valid languages with} |U|=|M|=4$\par
+$p(m) = \text{Dirichlet}(ones)$\par
+$S(u|m; \ell) = \text{S1 rsa speaker}$\par
+$L(m|u; \ell) = \text{L0 rsa listener}$\par
+
+### Results
+We run $n=100$ simulations in four condtions. Our first is a *single-context* condition ( $|C|=1$) -- there is a only a single context describing $p(m|c_1)$. Our second condition contains two-contexts  ($|C| = 2$) -- we consider efficiency under both $p(m|c_1)$ as well as $p(m|c_2)$. The third and fourth condition correspond accordingly with $|C|=3$ and $|C| = 4$, respectively. In each condition we consider a random set of utterances costs $P(u)$ and need probabilities $p(m|c)$ parametrized as Dirichlet distributions with $\alpha=1$. Piantadosi et al. (2012) argued that ambiguity is an efficient property of contextualized langauge use. That is, it is useful to assign words multiple meanings if those words can be disambiguated in context. Formalized in our setting, this would mean that we expect $\ell*$ to be more likely to contain ambiguous mappings as the number of contexts increases.par
+Figure 1. plots the proportion of optimal languages under $H_{cross}(P_{Speaker}, P_{Listener})$ for each condition. We find that as the number of contexts increases, so does the probability that optimal language $\ell*$ contains ambiguity. For comparison we also include the optimal language under an objective that only considers speaker or listener effort. In line, with Zipf's predictions, if langauges are designed only to minimize speaker effort then optimal languages will assign all meanings to a single, low-cost utterance. Likewise, if langauges are designed only to minimize speaker listener effor then ambiguity should alwasy be avoided.
+
+```{r fig1, fig.env="figure", fig.pos = "H", fig.align = "center", fig.width=4, fig.height=4, fig.cap = "Optimal languages are more likely to contain ambiguous items as amount of contextual information increases. Vertical axis shows the proportion of optimal languages that contain ambiguity. Horizontal axis shows the number of contexts in each condition (1-4). Red-line represents the optimal langauge under our Zipfian cross-entropy objective while the blue and red lines show optimal languages under speaker- and listener-only consideration."}
+img <- png::readPNG("figs/fig1.png")
+grid::grid.raster(img)
+```
+
+Piantadosi et al. (2012) framed their theory in terms of conditional entropy. That is, $H(X|C) < H(X)$ when $C$ provides information about $X$. Put differently, when $I(X, C)$ is non-zero. In our setting this would indicate that as the amount of contextual information increases, the difference between the conditional and unconditional measures of information should increase. That is, $H_{cross}(P_{Speaker}, P_{Listener}|C_1) - H_{cross}(P_{Speaker}, P_{Listener}) < H_{cross}(P_{Speaker}, P_{Listener}|C_2) - H_{cross}(P_{Speaker}, P_{Listener})$ when $C_1$ contains more information than $C_2$. We can consider this very metric in our conditions. Figure 2 plots $H_{cross}(P_{Speaker}, P_{Listener}|C_1) - H_{cross}(P_{Speaker}, P_{Listener})$ in each of our conditions. As the number of contexts increases, the difference in efficiency when context is disambiguating increaess as well.
+```{r fig2, fig.env="figure", fig.pos = "H", fig.align = "center", fig.width=2.5, fig.height=3, fig.cap = "The gains in efficinecy increase as the amount of contextual information increases. Vertical axis shows the difference in cross-entropy for when context is informative. Horizontal axis shows each of the four conditions. Note that the difference for condition 1 is zero as thered is only a single context." }
+img <- png::readPNG("figs/fig2.png")
+grid::grid.raster(img)
+```
+
+### Summary
+Piantadosi et al. (2012) argued that it is useful to re-use low-cost linguistic forms for multiple meanings when they can be disambiguated in context. Using our speaker-listener cross-entropy measure of efficiency we showed that optimal langauges are more likely to have ambiguous items when context is informative. Further, we showed that the impact of being able to disambiguate langauge (having access to $p(m|c_i)$) is increasingly efficienct as the amount of common-ground (context) increases.
+
+## Experiment 2: Rational-pragmatic speakers use ambiguity efficiently
+Our first experiment made a fairly direct test of the communicative function of ambiguity proposed by Piantadosi et al. (2012). Sampling a set of need probabilities and utterance costs we explored the space of possible languages, examining the properties of the language $\ell*$ which minimized our objective. Results indicated that ambiguity is an efficient property when context is informative. This experiment, however, assumed that our speaker and listener agents could disambiguate items context. That is, in our four conditions both agents had access to these conditional distributions $p(m|c_1), \dots, p(m|c_4)$. More often than not in day-to-day language use, speakers and listeners may not have perfect knowledge of the particular set of need probabilities $p(m)$ being used. Put differently, if ambiguity is only efficient when it can be disambiguated in context, speakers should avoid using ambiguous items if they know their listener may not be able to disambiguate the item.\par
+In experiment two we examine speaker behavior in a scenario in which the listener does not know the exact set of need probabilites a priori. That is, the listener has uncertainty over $p(m)$. Over the course of a discourse $D$ the listener tries to infer the context along with the particular intended meaning of a given utterance. That is, we consider a listener model $L(c, m|u;D)$ where $c$ is the particular context (or *topic*) being discussed and $D$ is the set of previous utterances the speaker has made. Likewise we consider a speaker model $S(u|m, c, D)$ who chooses an utterance based on an intended meaning $m$, the particular context of conversation $c$, while also considering the history of their utterance $D$. If speakers are behaving efficiently they should only use ambiguous items when they can be disambiguated in context. That is, if the listener agents is able to correctly infer the topic of conversation as the conversation progresses $D\rightarrow\inf$ then the speaker should be more likely to use ambiguous items later in discourse.
+
+### Simulation set-up \newline
+
+$\ell = \text{current language known to both speaker and listener}$\par
+$D = \text{History of previous utterances by speaker}$\par
+$S(u|m; \ell) = \text{S1 rsa speaker}$\par
+$L(m|u; \ell) = \text{L0 rsa listener}$\par
+$P(u) = \text{utterance costs in which } p(u_1) < p(u_2) < p(u_3) < p(u_4)$\par
+$c = \text{current topic, which specifies need probabilities}$\par
+$P(m|c) = \text{set of need probabilites specified by } c$\par
+
+### Results
+
+Fig3
+```{r fig3, fig.env="figure", fig.pos = "H", fig.align = "center", fig.width=2.5, fig.height=3, fig.cap = "R plot" }
+img <- png::readPNG("figs/fig3.png")
+grid::grid.raster(img)
+```
+
+Fig4
+```{r fig4, fig.env="figure", fig.pos = "H", fig.align = "center", fig.width=2.5, fig.height=3, fig.cap = "R plot" }
+img <- png::readPNG("figs/fig4.png")
+grid::grid.raster(img)
+```
+
+### Summary
+
+## Experiment 3: “More” pragmatic leads to more efficiency
+
+### Simulation set-up
+
+### Results
+
+Fig5
+```{r fig5, fig.env="figure", fig.pos = "H", fig.align = "center", fig.width=2.5, fig.height=3, fig.cap = "R plot" }
+img <- png::readPNG("figs/fig5.png")
+grid::grid.raster(img)
+```
+
+### Summary
+
+# Discussion
+
+# Conclusion
+
+
+
+
+
+
+
+
+
+
+
+# General Formatting Instructions 
+
+For general information about authoring in markdown, see **[here](http://rmarkdown.rstudio.com/authoring_basics.html).**
+
+For standard spoken papers and standard posters, the entire 
+contribution (including figures, references, everything) can be 
+no longer than six pages. For abstract posters, the entire contribution 
+can be no longer than one page. For symposia, the entire contribution 
+can be no longer than two pages.
+
+The text of the paper should be formatted in two columns with an
+overall width of 7 inches (17.8 cm) and length of 9.25 inches (23.5
+cm), with 0.25 inches between the columns. Leave two line spaces
+between the last author listed and the text of the paper. The left
+margin should be 0.75 inches and the top margin should be 1 inch.
+\textbf{The right and bottom margins will depend on whether you use
+U.S. letter or A4 paper, so you must be sure to measure the width of
+the printed text.} Use 10 point Times Roman with 12 point vertical
+spacing, unless otherwise specified.
+
+The title should be in 14 point, bold, and centered. The title should
+be formatted with initial caps (the first letter of content words
+capitalized and the rest lower case). Each author's name should appear
+on a separate line, 11 point bold, and centered, with the author's
+email address in parentheses. Under each author's name list the
+author's affiliation and postal address in ordinary 10 point  type.
+
+Indent the first line of each paragraph by 1/8~inch (except for the
+first paragraph of a new section). Do not add extra vertical space
+between paragraphs.
+
+# First-Level Headings
+
+First level headings should be in 12 point , initial caps, bold and
+centered. Leave one line space above the heading and 1/4~line space
+below the heading.
+
+## Second-Level Headings
+
+Second level headings should be 11 point , initial caps, bold, and
+flush left. Leave one line space above the heading and 1/4~ line
+space below the heading.
+
+### Third-Level Headings
+
+Third-level headings should be 10 point , initial caps, bold, and flush
+left. Leave one line space above the heading, but no space after the
+heading.
+
+# Formalities, Footnotes, and Floats
+
+Use standard APA citation format. Citations within the text should
+include the author's last name and year. If the authors' names are
+included in the sentence, place only the year in parentheses, as in
+[-@NewellSimon1972a], but otherwise place the entire reference in
+parentheses with the authors and year separated by a comma
+[@NewellSimon1972a]. List multiple references alphabetically and
+separate them by semicolons [@ChalnickBillman1988a; @NewellSimon1972a]. 
+Use the et. al. construction only after listing all the authors to a
+publication in an earlier reference and for citations with four or
+more authors.
+
+For more information on citations in RMarkdown, see **[here](http://rmarkdown.rstudio.com/authoring_bibliographies_and_citations.html#citations).**
+
+## Footnotes
+
+Indicate footnotes with a number\footnote{Sample of the first
+footnote.} in the text. Place the footnotes in 9 point type at the
+bottom of the page on which they appear. Precede the footnote with a
+horizontal rule.\footnote{Sample of the second footnote.} You can also use 
+markdown formatting to include footnotes using this syntax [^1].
+
+[^1]: Sample of a markdown footnote.
+
+## Figures
+
+All artwork must be very dark for purposes of reproduction and should
+not be hand drawn. Number figures sequentially, placing the figure
+number and caption, in 10 point, after the figure with one line space
+above the caption and one line space below it. If necessary, leave extra white space at
+the bottom of the page to avoid splitting the figure and figure
+caption. You may float figures to the top or bottom of a column, or
+set wide figures across both columns.
+
+## Two-column images
+
+You can read local images using png package for example and plot 
+it like a regular plot using grid.raster from the grid package. 
+With this method you have full control of the size of your image. **Note: Image must be in .png file format for the readPNG function to work.**
+
+You might want to display a wide figure across both columns. To do this, you change the `fig.env` chunk option to `figure*`. To align the image in the center of the page, set `fig.align` option to `center`. To format the width of your caption text, you set the `num.cols.cap` option to `2`.
+
+```{r 2-col-image, fig.env = "figure*", fig.pos = "h", fig.width=4, fig.height=2, fig.align = "center", set.cap.width=T, num.cols.cap=2, fig.cap = "This image spans both columns. And the caption text is limited to 0.8 of the width of the document."}
+img <- png::readPNG("figs/walrus.png")
+grid::grid.raster(img)
+```
+
+## One-column images
+
+Single column is the default option, but if you want set it explicitly, set `fig.env` to `figure`. Notice that the `num.cols` option for the caption width is set to `1`.
+
+```{r image, fig.env = "figure", fig.pos = "H", fig.align='center', fig.width=2, fig.height=2, set.cap.width=T, num.cols.cap=1, fig.cap = "One column image."}
+img <- png::readPNG("figs/lab_logo_stanford.png")
+grid::grid.raster(img)
+```
+
+
+## R Plots
+
+You can use R chunks directly to plot graphs. And you can use latex floats in the
+fig.pos chunk option to have more control over the location of your plot on the page. For more information on latex placement specifiers see **[here](https://en.wikibooks.org/wiki/LaTeX/Floats,_Figures_and_Captions)**
+
+```{r plot, fig.env="figure", fig.pos = "H", fig.align = "center", fig.width=2, fig.height=2, fig.cap = "R plot" }
+x <- 0:100
+y <- 2 * (x + rnorm(length(x), sd = 3) + 3)
+
+ggplot2::ggplot(data = data.frame(x, y), 
+       aes(x = x, y = y)) + 
+  geom_point() + 
+  geom_smooth(method = "lm")
+```
+
+
+## Tables
+
+Number tables consecutively; place the table number and title (in
+10 point) above the table with one line space above the caption and
+one line space below it, as in Table 1. You may float
+tables to the top or bottom of a column, set wide tables across both
+columns.
+
+You can use the xtable function in the xtable package.
+
+```{r xtable, results="asis"}
+n <- 100
+x <- rnorm(n)
+y <- 2*x + rnorm(n)
+out <- lm(y ~ x)
+
+tab1 <- xtable::xtable(summary(out)$coef, digits=c(0, 2, 2, 1, 2), 
+                      caption = "This table prints across one column.")
+
+print(tab1, type="latex", comment = F, table.placement = "H")
+```
+
+# Acknowledgements
+
+Place acknowledgments (including funding information) in a section at
+the end of the paper.
+
+# References 
+
+```{r}
+# References will be generated automatically by Pandoc and included here.
+# The following code is some latex to format the bibliography. Do not remove it.
+```
+
+\setlength{\parindent}{-0.1in} 
+\setlength{\leftskip}{0.125in}
+\noindent
