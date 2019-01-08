@@ -13,7 +13,7 @@ abstract:
 
     
 keywords:
-    "Communicaive efficiency, Rational Speech Act theory, computational modeling, information theory, agent-based simulation"
+    "Communicative efficiency, Rational Speech Act theory, computational modeling, information theory, agent-based simulation"
     
 output: cogsci2016::cogsci_paper
 ---
@@ -32,21 +32,26 @@ library(xtable)
 
 # Introduction
 
-Why do natural languages look they way they do? While Zipf (1935) presented his “Principle of Least effort” as a domain general framework for understanding human behavior, he took language as his central case-study. He proposed that distributional properties found in natural language were evidence of speaker-listener utility maximization or, equivalently, effort minimization. In his own words, “we are arguing that people do in fact act with a maximum economy of effort, and that therefore in the process of speaking-listening they will automatically minimize the expenditure of effort.” Evidence supporting this hypothesis has been realized in a set of well-known findings, largely falling under what is now known as Zipf’s Law or Zipfian distributions -- one of a family of discrete power law distributions. A range of empirical phenomena in social and physical sciences are well-described as Zipfian, from the relationship between word rank and frequency (CITATION) to the populations of U.S. cities (CITATION) Stanford stats class 306a).\par
+Why do natural languages look they way they do? While Zipf (1935) presented his “Principle of Least Effort” as a domain general framework for understanding human behavior, he took language as his central case-study. He proposed that distributional properties found in natural language were evidence of speaker-listener effort minimization. In his own words, “we are arguing that people do in fact act with a maximum economy of effort, and that therefore in the process of speaking-listening they will automatically minimize the expenditure of effort.” Evidence for this claim was largely derived at the level of the lexicon. Zipf argued that the particular relationship between a word’s frequency and its rank, length, and denotation size could be explained as emergent phenomena from speaker-listener effort minimization. \par
 
-Language-structure and use provide a particularly fascinating case-study under an efficiency-based analysis as speaker- and listener-effort is asymmetric. Simply put, in the act of communicating with another person, what is effortful as a speaker is likely different from what is effortful as a listener. For example, Zipf noted that purely from the standpoint of speaker effort, what Zipf called "Speaker's Economy," an optimal language $\ell_{speaker}^*$ would tend toward a vocabulary of just a single, low-cost word. Given such a language, the full set of potential meanings would be conveyed using only that word, i.e. $\ell_{speaker}^*$ would be fully ambiguous and all possible meanings would need to be disambiguated by a listener. Conversely, from the standpoint of listener effort, what Zipf called "Auditor's Economy," an optimal language $\ell_{listener}^*$ would bijectively map all possible meanings to distinct words, eliminating a listener's need to disambiguate. Under this analysis, speaker effort is related to production cost and listener effort to understanding (disambiguation) cost. Clearly natural languages fall between the two extremes of $\ell_{speaker}^*$ and $\ell_{listener}^*$. Zipf’s Law of Meaning proposes that the particular relation between a word’s frequency and denotation size emerge from the competition of these forces -- the pressure to jointly minimize speaker and listener effort.\par
+Zipf articulated what is now considered a *functionalist* approach to language science -- analyzing language structure and use in terms of efficiency. Such an approach might reframe our opening question as follows -- how does having property $x$ make using language $\ell$ more or less useful for communication? This reframing provides an opportunity to study both language *structure* (as Zipf primarily did) or *use* in terms of efficiency. For example, Regier et al. (201X) showed that languages appear organize semantic domains (form-meaning mappings) in maximally efficient ways. Likewise, Piantadosi et al. (2012) argued that lexical ambiguity is a useful property of any communication system when communication is contextualized. We will return to Piantadosi’s argument later in the paper.\par
 
-A range of more recent approaches to language science have distinctly Zipfian roots (functionalist theories). In terms of our opening question, “why do languages look the way they do?”, a functionalist approach would formalize the question in terms of information-theoretic principles of efficiency -- how does having property $x$ make using language $\ell$ more or less useful for communication? This family of theories has described a range of phenomena in language-design (compositionality, ambiguity, dependency length) and language-use (redundancy and reduction) in terms of communicative efficiency. Of particular interest to our current work, Piantadosi et al. (2012) argued that efficiently *designed* linguistic systems will contain ambiguous lexical items when communication is contextualized. If words with multiple meanings can be disambiguated in context, less costly forms can be re-used efficiently. They showed in a series of analyses that … [WHAT PIANTADOSI DID HERE!!!!]. \par
+As the opening question indicates, language has both *structure* and *users*. Either of these dimensions are available to analysis. For example, both Regier (CITATION) and Piantadosi, et al (2012) assumed that language users were approximately Bayesian. In particular, Piantadosi needed to assume that language users could *use* context during conversation to derive their particular argument. \par
 
-Zipf’s principle of least effort and it’s associated speaker and listener instantations were intended as a framework for explaining all of natural language. Evidence for the theory was largely derived from vocabulary-level analysis. Implicit in Zipf’s (1935) argument is that aggregate, distributional-level effects emerge from optimization during local interactions between speaker-listeners. While Functionalist projects have provided evidence that speaker’s attempt to optimize their output at a variety of levels -- phonologically (morphological contraction; Bell et al., 2003), syntactically (Levy & Jaeger, 2007; Jaeger, 2010) and over even over discourse (Genzel & Charniak, 2002), Zipf was less precise in terms of his exact level of analysis -- however his example of optimal speaker and listener language in which a single word $u$ can express some meaning $m$$[[u]]\neq \emptyset$.
+// Maybe don’t include par below...
+Other work has focused more directly on efficient use of linguistic properties. For example, Levy & Jaeger (2007) showed speakers will choose to include an optional language items when oncoming material is high-surprisal. They argued this behavior indicates an efficient strategy under an information-theoretic analysis, following from Shannon’s Source Coding Theorem. Such efficient use of redundancy has also been described at the morphological level (CITATION) and across multiple languages (CITATION). Similar theories have described efficient production behavior at the level of discourse.\par
+
+There is little coincidence that Zipf introduced his Principle of Least Effort with an analysis of language. Language-structure and -use provide a particularly fascinating case-study under an efficiency-based analysis as speaker- and listener-effort is asymmetric. Simply put, in the act of communicating with another person, what is effortful as a speaker is likely different from what is effortful as a listener. For example, Zipf noted that purely from the standpoint of speaker effort, what Zipf called "Speaker's Economy," an optimal language $\ell_{speaker}^*$ would tend toward a vocabulary of just a single, low-cost word. Given such a language, the full set of potential meanings would be conveyed using only that word, i.e. $\ell_{speaker}^*$ would be fully ambiguous and all possible meanings would need to be disambiguated by a listener. Conversely, from the standpoint of listener effort, what Zipf called "Auditor's Economy," an optimal language $\ell_{listener}^*$ would bijectively map all possible meanings to distinct words, eliminating a listener's need to disambiguate. Under this analysis, speaker effort is related to production cost and listener effort to understanding (disambiguation) cost. Clearly natural languages fall between the two extremes of $\ell_{speaker}^*$ and $\ell_{listener}^*$. Zipf proposed that the particular lexicon-level properties he observed emerged from the competition of these forces -- the pressure to jointly minimize speaker and listener effort.\par
+
+Implicit in Zipf’s (1935) argument is that aggregate, distributional-level effects emerge from optimization during local interactions between speaker-listeners. However, Zipf did not formalize ``local interaction” beyond the example of a optimal speaker and listener languages. In that example, he described a reference game setting; similar to those described by Wittgenstein (CITATION). In this scenario, speakers and listeners are aware of a set of objects $M$, which will refer to as *meanings* and are knowledgeable about the set of possible signals $U$ (*utterances*) that could be used by a speaker to refer to a given meaning. Utterances may differ in their cost, the number of meanings to which they refer, and the objects may also vary in the degree to which they need to be described in a given context. Subsequent functionalist projects examining efficient language structure (Piantadosi, Regier) have also adopted the reference game setting as the primary unit of analysis.
 
 A half century after Zipf, the linguist Lawrence Horn (1984), highlighted the importance of Zipf’s principles for explaining conversation-level phenomena. Horn suggested a direct link between Zipf’s Speaker and Listener economy and, what was at the time, more recent work on conversational pragmatics by Grice (1975). Horn highlighted that the interaction of Zipf’s forces were “largely responsible for generating Grice’s conversational maxims and the schema for pragmatic inference derived therefrom.” Put differently, system-level efficiency we see in languages is deeply related to local-level efficiency during the in-the-moment interactions of speakers and listeners. \par
 
-In this work we present a step toward formalizing this connection highlighted by Horn -- formalizing the theoretical connection between Zipfian and Grice, and in doing so, deriving aggregate, distributional level properties from local, in-the-moment interactions of speaker-listeners. To gain traction on this project we adopt a simulation-based approach, modeling communication as reference games in which we can vary the types of agents and languages present. This framework allows us to investigate a range of functionalist theories broadly under the categories of efficient language design and language use. \par
+In this work we present a step toward formalizing this connection highlighted by Horn -- formalizing the theoretical connection between Zipf and Grice, and in doing so, deriving aggregate, distributional level properties from local, in-the-moment interactions of speaker-listeners. To gain traction on this project we adopt a simulation-based approach, modeling communication as reference games in which we can vary the types of agents and languages present. This framework allows us to investigate a range of functionalist theories broadly under the categories of efficient language design and language use. \par
 
-For this particular project we focus on an analysis of the communicative function of ambiguity in language following work by Piantadosi et al. (2012). We adopt this particular linguistic phenomena to demonstrate the extent to which we can explore both the design- and use- based functionalist ideas. We focus on three questions -- (1) when is it desirable to have a language with lexical ambiguity? (2) Under what circumstances do speakers and listeners use ambiguity efficiently?\par
+As a proof of concept, we focus on an analysis of the communicative function of ambiguity in language following work by Piantadosi et al. (2012). We adopt this particular linguistic phenomena to demonstrate the extent to which we can explore both the design- and use- based functionalist ideas. We focus on the question of efficient language structure and efficient language use. In the former, we ask ''when is it desirable to have a language with lexical ambiguity?” In the latter we ask ``under what circumstances do speakers and listeners use ambiguity efficiently?” \par
 
-We begin with a high-level introduction to the modelling framework introducing the basic ingredients we will need to represent language as repeated reference games. Following this introduction we derive a simple objective function for measuring the efficiency of linguistics systems in this setting. Subsequently, we move on to two case-studies examining the questions posed above, framing results in terms of our efficiency measure.
+We begin with a high-level introduction to the modelling framework introducing the basic ingredients we will need to represent language as repeated reference games. Following this introduction we derive a simple objective function for measuring the efficiency of linguistic systems in this setting. Subsequently, we move on to two case-studies examining the questions posed above, framing results in terms of our efficiency measure.
 
 # Exploring efficient language- design and use in rational pragmatic agents
 
@@ -82,9 +87,9 @@ In general, we would like to consider the efficiency of a system $\ell$ in terms
 
 ## Metrics for optimal linguistic systems in the reference game setting
 
-To assess the optimality of a linguistic system we need some measure of goodness. In other words an objective function, which, as a function of the particular linguistic system $\ell$ and the speaker $S$ and listener $L$ agents returns a measure of the system efficiency ( $f(S, L, \ell) \rightarrow \mathbb{R}$).  For our purposes we’d like to tie this objective to fundamental principles of speaker and listener effort suggested by Zipf. Additionally, we will take the fundamental unit of analysis as the reference game event. \par
+Given a linguistic system $\ell$ used by a speaker $S$ and listener $L$ we need some measure of efficiency. For our present purposes, we’d like to tie this objective to fundamental principles of speaker and listener effort suggested by Zipf. To this end, we define an objective function, which as a function of a particular linguistic system $\ell$, speaker $S$ and listener $L$ returns some measure of efficiency (i.e. $f(S, L, \ell) \rightarrow \mathbb{R}$).  Additionally, we will take the fundamental unit of analysis as the reference game event. \par
 
-We now derive an objective function from Zipfian first principles. Zipf proposed that the particular distributional properties found in natural language emerge as a result of competing speaker and listener pressures. We operationalize this in equation (1) -- the efficiency of a linguistic system $\ell$ being used by speaker and listener agents $S$ and $L$ is sum of the expected speaker and listener effort to communicate over all possible communicative events.
+Zipf proposed that the particular distributional properties found in natural language emerge as a result of competing speaker and listener pressures. We operationalize this in equation (1) -- the efficiency of a linguistic system $\ell$ being used by speaker and listener agents $S$ and $L$ is sum of the expected speaker and listener effort to communicate over all possible communicative events.
 
 \begin{equation}
 \text{Efficiency}(S, L, \ell) = \mathbb{E}_{e \in E}[\text{speaker effort}] + \\ \mathbb{E}_{e \in E}[\text{listener effort}]
@@ -138,6 +143,7 @@ This is the simply the cross-entropy between the speaker an listener joint distr
 \end{split}
 \end{equation}
 From a mathematical standpoint this objective is intuitive. An optimal linguistic system being used by a speaker and listener agent will induce a particular set of form-meaning mappings that are both *close* between speaker and listener agents and *peaky* in that they assign non-uniform probability mass to the valid form-meaning mappings.
+
 
 # Two case-studies on efficient language use and design
 We now have a metric for exploring questions of language optimality in the reference game setting (the speaker-listener cross-entropy). In the following sections we examine the behavior of the objective with respect to the communicative function of ambiguity. In particular, we examine three questions. The first is a question of optimal design -- given a set of possible languages $L$ in what circumstances does the optimal languages $\ell^*$ contain ambiguity? The second is a question of optimal *use* -- give a particular language that theoretically allows for the use of ambiguous material under what circumstances will ambiguous forms be used efficiently?
@@ -266,166 +272,6 @@ grid::grid.raster(img)
 # Discussion
 
 # Conclusion
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# General Formatting Instructions 
-
-For general information about authoring in markdown, see **[here](http://rmarkdown.rstudio.com/authoring_basics.html).**
-
-For standard spoken papers and standard posters, the entire 
-contribution (including figures, references, everything) can be 
-no longer than six pages. For abstract posters, the entire contribution 
-can be no longer than one page. For symposia, the entire contribution 
-can be no longer than two pages.
-
-The text of the paper should be formatted in two columns with an
-overall width of 7 inches (17.8 cm) and length of 9.25 inches (23.5
-cm), with 0.25 inches between the columns. Leave two line spaces
-between the last author listed and the text of the paper. The left
-margin should be 0.75 inches and the top margin should be 1 inch.
-\textbf{The right and bottom margins will depend on whether you use
-U.S. letter or A4 paper, so you must be sure to measure the width of
-the printed text.} Use 10 point Times Roman with 12 point vertical
-spacing, unless otherwise specified.
-
-The title should be in 14 point, bold, and centered. The title should
-be formatted with initial caps (the first letter of content words
-capitalized and the rest lower case). Each author's name should appear
-on a separate line, 11 point bold, and centered, with the author's
-email address in parentheses. Under each author's name list the
-author's affiliation and postal address in ordinary 10 point  type.
-
-Indent the first line of each paragraph by 1/8~inch (except for the
-first paragraph of a new section). Do not add extra vertical space
-between paragraphs.
-
-# First-Level Headings
-
-First level headings should be in 12 point , initial caps, bold and
-centered. Leave one line space above the heading and 1/4~line space
-below the heading.
-
-## Second-Level Headings
-
-Second level headings should be 11 point , initial caps, bold, and
-flush left. Leave one line space above the heading and 1/4~ line
-space below the heading.
-
-### Third-Level Headings
-
-Third-level headings should be 10 point , initial caps, bold, and flush
-left. Leave one line space above the heading, but no space after the
-heading.
-
-# Formalities, Footnotes, and Floats
-
-Use standard APA citation format. Citations within the text should
-include the author's last name and year. If the authors' names are
-included in the sentence, place only the year in parentheses, as in
-[-@NewellSimon1972a], but otherwise place the entire reference in
-parentheses with the authors and year separated by a comma
-[@NewellSimon1972a]. List multiple references alphabetically and
-separate them by semicolons [@ChalnickBillman1988a; @NewellSimon1972a]. 
-Use the et. al. construction only after listing all the authors to a
-publication in an earlier reference and for citations with four or
-more authors.
-
-For more information on citations in RMarkdown, see **[here](http://rmarkdown.rstudio.com/authoring_bibliographies_and_citations.html#citations).**
-
-## Footnotes
-
-Indicate footnotes with a number\footnote{Sample of the first
-footnote.} in the text. Place the footnotes in 9 point type at the
-bottom of the page on which they appear. Precede the footnote with a
-horizontal rule.\footnote{Sample of the second footnote.} You can also use 
-markdown formatting to include footnotes using this syntax [^1].
-
-[^1]: Sample of a markdown footnote.
-
-## Figures
-
-All artwork must be very dark for purposes of reproduction and should
-not be hand drawn. Number figures sequentially, placing the figure
-number and caption, in 10 point, after the figure with one line space
-above the caption and one line space below it. If necessary, leave extra white space at
-the bottom of the page to avoid splitting the figure and figure
-caption. You may float figures to the top or bottom of a column, or
-set wide figures across both columns.
-
-## Two-column images
-
-You can read local images using png package for example and plot 
-it like a regular plot using grid.raster from the grid package. 
-With this method you have full control of the size of your image. **Note: Image must be in .png file format for the readPNG function to work.**
-
-You might want to display a wide figure across both columns. To do this, you change the `fig.env` chunk option to `figure*`. To align the image in the center of the page, set `fig.align` option to `center`. To format the width of your caption text, you set the `num.cols.cap` option to `2`.
-
-```{r 2-col-image, fig.env = "figure*", fig.pos = "h", fig.width=4, fig.height=2, fig.align = "center", set.cap.width=T, num.cols.cap=2, fig.cap = "This image spans both columns. And the caption text is limited to 0.8 of the width of the document."}
-img <- png::readPNG("figs/walrus.png")
-grid::grid.raster(img)
-```
-
-## One-column images
-
-Single column is the default option, but if you want set it explicitly, set `fig.env` to `figure`. Notice that the `num.cols` option for the caption width is set to `1`.
-
-```{r image, fig.env = "figure", fig.pos = "H", fig.align='center', fig.width=2, fig.height=2, set.cap.width=T, num.cols.cap=1, fig.cap = "One column image."}
-img <- png::readPNG("figs/lab_logo_stanford.png")
-grid::grid.raster(img)
-```
-
-
-## R Plots
-
-You can use R chunks directly to plot graphs. And you can use latex floats in the
-fig.pos chunk option to have more control over the location of your plot on the page. For more information on latex placement specifiers see **[here](https://en.wikibooks.org/wiki/LaTeX/Floats,_Figures_and_Captions)**
-
-```{r plot, fig.env="figure", fig.pos = "H", fig.align = "center", fig.width=2, fig.height=2, fig.cap = "R plot" }
-x <- 0:100
-y <- 2 * (x + rnorm(length(x), sd = 3) + 3)
-
-ggplot2::ggplot(data = data.frame(x, y), 
-       aes(x = x, y = y)) + 
-  geom_point() + 
-  geom_smooth(method = "lm")
-```
-
-
-## Tables
-
-Number tables consecutively; place the table number and title (in
-10 point) above the table with one line space above the caption and
-one line space below it, as in Table 1. You may float
-tables to the top or bottom of a column, set wide tables across both
-columns.
-
-You can use the xtable function in the xtable package.
-
-```{r xtable, results="asis"}
-n <- 100
-x <- rnorm(n)
-y <- 2*x + rnorm(n)
-out <- lm(y ~ x)
-
-tab1 <- xtable::xtable(summary(out)$coef, digits=c(0, 2, 2, 1, 2), 
-                      caption = "This table prints across one column.")
-
-print(tab1, type="latex", comment = F, table.placement = "H")
-```
 
 # Acknowledgements
 
