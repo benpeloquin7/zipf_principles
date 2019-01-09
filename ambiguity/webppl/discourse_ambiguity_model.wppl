@@ -1,9 +1,9 @@
 // Discourse ambiguity model
 // =========================
 //
-// This models a speaker who has some topic T in mind
+// This models a speaker who has some topic t \in T in mind
 // and produces utterances to convey both incremental 
-// meanings m and the overall topic T. 
+// meanings m and the overall topic t. 
 // We can track both the changing content of the discourse
 // revealing the Constant Entropy Rate effect as well
 // as the overalll Speaker / Listener Cross-Entropy.
@@ -56,8 +56,8 @@ var worldsPrior = function() {return sample(wordsDistr)}
 
 // Utterances
 var utterances = ['a', 'b', 'c', 'd', 'x', 'y']
-var utteranceWeights = [1, 1, 1, 1, 4, 4]
-// var utteranceWeights = repeat(utterances.length, function(x) {1})
+var utteranceWeights = [1, 1, 1, 1, 6, 6]
+//var utteranceWeights = repeat(utterances.length, function(x) {1})
 var utterancesDistr = Categorical({vs:utterances, ps:utteranceWeights})
 var utterancesPrior = function() {return sample(utterancesDistr)}
 
@@ -317,7 +317,11 @@ var listenerTopicDistrPosterior = cache(function(observedData) {
   })
 })
 
+// High-level speaker-listener agents
+// ==================================
 
+// Discourse aware listener
+//
 var LDiscourseAware = cache(function(utterance, data) {
   Infer({
     model() {
@@ -333,12 +337,39 @@ var LDiscourseAware = cache(function(utterance, data) {
   })
 })
 
+// Discourse Unaware listener
+//
+var LDiscourseUnaware = cache(function(utterance, data) {
+  Infer({
+    model() {
+      var estTopicDistrName = topicNamesPrior() // Note we simply sample for topics prior
+      var estWorld = sampleWorldFromTopic(estTopicDistrName)()
+      var S = getSpeakerModel(RECURSION_LEVEL)(estWorld)
+      factor(S.score(utterance))
+      return {'estWorld': estWorld, 'estTopicDistrName': estTopicDistrName}
+    }
+  })
+})
+
 var SDiscourseAware = cache(function(world, T, data) {
   Infer({
     model() {
       // var world = sampleWorldFromTopic(T)()
       var utterance = utterancesPrior()
       var L = LDiscourseAware(utterance, data)
+      factor(alpha * (L.score({'estWorld': world, 'estTopicDistrName': T}) - cost(utterance)))
+      return {'utterance': utterance}
+    }
+  })
+})
+
+// Unaware Speaker is equivalent to S0
+var SDiscourseUnaware = cache(function(world, T, data) {
+  Infer({
+    model() {
+      // var world = sampleWorldFromTopic(T)()
+      var utterance = utterancesPrior()
+      var L = LDiscourseUnaware(utterance, data)
       factor(alpha * (L.score({'estWorld': world, 'estTopicDistrName': T}) - cost(utterance)))
       return {'utterance': utterance}
     }
@@ -383,6 +414,7 @@ var contextSlices = map(function(x) {return [0, x]}, dataSizes)
 // Calculate speaker / listener cross entropy.
 //
 var crossEntropy = function(speaker, listener, data) {
+  // E_{~S(u|m,D)p(m|T=t)p(T=t)}[L(m, T|u, D)p(T|D)p(u)]
   Infer({method:'enumerate'}, function() {
     var T = targetDistr
     // p(m|t)
@@ -457,7 +489,7 @@ var speakerEffort = function(speaker, listener, data) {
 // =============
 // \sum_{u, m}S(u|m)p(m|t)log2(L(m|u,d)p(T|d))
 //
-var listenerEffort = function(speaker, listener, data) {
+var listenerEffort = function(speaker, listener, data, useData=true) {
   Infer({method:'enumerate'}, function() {
     var T = targetDistr
     // p(m|t)
@@ -471,16 +503,16 @@ var listenerEffort = function(speaker, listener, data) {
     // p(m|u, d)
     var p_m_given_u = listener(u, data)
     // p(t|d)
-    var p_t_given_d = listenerTopicDistrPosterior(data)
+    var p_t_given_d = useData ? listenerTopicDistrPosterior(data) : topicNamesDistr
     return p_m_given_u.score({'estWorld': m, 'estTopicDistrName': T}) + p_t_given_d.score(T)
       
   })
 }
 
-var trackObjective = function(objective, utterances) {
+var trackObjective = function(objective, utterances, speaker, listener) {
   var res = map(function(x) {    
-    return expectation(objective(SDiscourseAware, 
-                                  LDiscourseAware, 
+    return expectation(objective(speaker, 
+                                  listener, 
                                   utterances.slice(x[0], x[1])))
   }, contextSlices)
   return res
@@ -510,9 +542,12 @@ var getListenerInferences = function(utterances) {
 //
 var processUtterances = function(speakerData, 
                                   listenerInferences, 
-                                  crossEntropies, 
+                                  crossEntropies,
+                                  naiveCrossEntropies,
                                   kls, 
+                                  naiveKLs,
                                   listenerCosts,
+                                  naiveListenerCosts,
                                   speakerCosts) {
   var dMap = map(function(x) {
     return {
@@ -523,8 +558,11 @@ var processUtterances = function(speakerData,
       'T3': listenerInferences[x]['T3'],
       'T4': listenerInferences[x]['T4'],
       'CE': crossEntropies[x],
+      'naiveCE': naiveCrossEntropies[x],
       'KL': kls[x],
+      'naiveKL': naiveKLs[x],
       'listenerCosts': listenerCosts[x],
+      'naiveListenerCosts': naiveListenerCosts[x],
       'speakerCosts': speakerCosts[x]}
   }, dataSizes)
   return dMap
@@ -544,39 +582,24 @@ var processUtterances = function(speakerData,
 // List of dicts
 //
 var runFn = function(resultType) {
-  // These is our model of interest -- the listener and speaker reason about discourse
-  if (resultType == 'contextAware') {
-    var utteranceList = speakerRecurse(targetDistr, [], nUtterances)
-    var listenerInferences = getListenerInferences(utteranceList)
-    var crossEntropies = trackObjective(crossEntropy, utteranceList)
-    var KLs = trackObjective(KL, utteranceList)
-    var listenerCosts = trackObjective(listenerEffort, utteranceList)
-    var speakerCosts = trackObjective(speakerEffort, utteranceList)
-    return processUtterances(utteranceList, listenerInferences, crossEntropies, KLs, listenerCosts, speakerCosts)
-  }
-  // Comparison model 1 - Speaker never reasons about discrouse
-  else if (resultType == 'contextUnaware') {
-    var utteranceList = repeat(nUtterances, function(x) { 
-      var world = sampleWorldFromTopic(targetDistr)()
-      sample(SDiscourseAware(world, targetDistr, []))['utterance'] 
-    })
-    var listenerInferences = getListenerInferences(utteranceList)
-    return processUtterances(utteranceList, listenerInferences)
-  } 
-  else if (resultType == 'S') {
-    var utteranceList = repeat(nUtterances, function(x) { return sample(SHelper(targetDistr)) })
-    var listenerInferences = getListenerInferences(utteranceList)
-    return processUtterances(utteranceList, listenerInferences)
-  }
-  // Simply sample from prior over utterances
-  else if (resultType == 'baseline') {
-    var utteranceList = repeat(nUtterances, (function(x) { return utterancesPrior() }))
-    var listenerInferences = getListenerInferences(utteranceList)
-    return processUtterances(utteranceList, listenerInferences)
-  } 
-  else {
-    error('Bad resultType:', resultType)
-  }
+  var utteranceList = speakerRecurse(targetDistr, [], nUtterances)
+  var listenerInferences = getListenerInferences(utteranceList)
+  var crossEntropies = trackObjective(crossEntropy, utteranceList, SDiscourseAware, LDiscourseAware)
+  var naiveCrossEntropies = trackObjective(crossEntropy, utteranceList, SDiscourseAware, LDiscourseUnaware)
+  var KLs = trackObjective(KL, utteranceList, SDiscourseAware, LDiscourseAware)
+  var naiveKLs = trackObjective(KL, utteranceList, SDiscourseAware, LDiscourseUnaware)
+  var listenerCosts = trackObjective(listenerEffort, utteranceList, SDiscourseAware, LDiscourseAware)
+  var naiveListenerCosts = trackObjective(listenerEffort, utteranceList, SDiscourseAware, LDiscourseUnaware, false)
+  var speakerCosts = trackObjective(speakerEffort, utteranceList, SDiscourseAware, LDiscourseAware)
+  return processUtterances(utteranceList, 
+    listenerInferences, 
+    crossEntropies, 
+    naiveCrossEntropies,
+    KLs, 
+    naiveKLs,
+    listenerCosts, 
+    naiveListenerCosts,
+    speakerCosts)
 }
 
 // 
