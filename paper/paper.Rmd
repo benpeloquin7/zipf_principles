@@ -26,6 +26,7 @@ knitr::opts_chunk$set(fig.width=3, fig.height=3, fig.crop = F, fig.pos = "tb", f
 ```{r, libraries}
 library(png)
 library(grid)
+library(gridExtra)
 library(ggplot2)
 library(xtable)
 ```
@@ -67,11 +68,13 @@ $u_3$ & 0 & 0 & 1 \\
 describes the literal semantics of $\ell$. E.g. the language describes semantic mappings $[\![u_1]\!]\ = \{m_1, m_2\}, [\![u_2]\!]\ = \{m_2\}, [\![u_3]\!]\ = \{m_3\}$.
 
 ### Speakers and listeners
-We adopt the Rational Speech-act framework (Frank & Goodman, 2012; Goodman & Frank, 2016) to operationalize our rational speaker-listeners. Under this setting, a *speaker agent* defines a conditional distribution over utterances, mapping from intended meanings $M$ to utterances $U$ using $\ell$. That is, a speaker defines $P_{speaker}(u|m;\ell)$. We will use $S(u|m;\ell)$ as short-hand throughout.  A *listener agent* defines a conditional distribution over meanings, mapping from utterances $U$ to meanings $M$ using $\ell$. We will use $L(m|u; \ell)$ as shorthand. Note that both speakers and listeners can induce joint distributions over the set of all signaling events $E$, although, importantly, these distributions may differ:
+The Rational Speech-act framework (RSA) is computational-level theory of pragmatic language use. This framework has proven productive in describing a range of phenomena in natural language understanding and generation including hyperbole, metaphor, scalar and ad-hoc implicature, among others (CITATIONS). RSA can largely be understood as a formalization of essential Gricean pragmatic principles -- interlocutors reasoning about one another and their context. For this reason, we adopt RSA as our representational framework to operationalize rational speaker-listeners. For a more extensive description of RSA as well as its application we refer readers to Goodman & Frank (2016), limiting the current discussion to essential, high-level details of the framework. \par
+
+An RSA *speaker agent* defines a conditional distribution over utterances, mapping from intended meanings $M$ to utterances $U$ using $\ell$. That is, a speaker defines $P_{speaker}(u|m;\ell)$. We will use $S(u|m;\ell)$ as short-hand throughout.  A *listener agent* defines a conditional distribution over meanings, mapping from utterances $U$ to meanings $M$ using $\ell$. We will use $L(m|u; \ell)$ as shorthand. Note that both speakers and listeners can induce joint distributions over the set of all signaling events $E$, although, importantly, these distributions may differ:
 $$P_{speaker}(u, m; \ell) = S(u|m; \ell)p(m)$$
 $$P_{listener}(u, m; \ell) = L(m|u; \ell)p(u)$$
 
-In general, we would like to consider the efficiency of a system $\ell$ in terms of these joint distributions. For a more detailed description of the RSA framework we refer the reader to Goodman & Frank (2016).
+In general, we would like to consider the efficiency of a system $\ell$ in terms of these joint distributions.
 
 # Zipfian objective for linguistic system efficiency
 
@@ -170,6 +173,12 @@ This in turn, leads to an update to our linguistic efficiency objective as we no
 
 Note that in the case that $|C| =1$, our objective simplifies to our original equation (7). With this update we can compare linguistics systems $L$ while varying the degree to which context contains useful information by varying the size of $|C|$.\par
 
+```{r plot-optimal-langs, fig.env = "figure*", fig.pos = "h", fig.width=6, fig.height=3, fig.align = "center", set.cap.width=T, num.cols.cap=2, fig.cap = "Left facet -- optimal languages are more likely to contain ambiguous items as amount of contextual information increases. Vertical axis shows the proportion of optimal languages that contain ambiguity. Horizontal axis shows the number of contexts in each condition (1-4). Red-line represents the optimal langauge under our Zipfian cross-entropy objective while the blue and red lines show optimal languages under speaker- and listener-only consideration. Right facet -- Gains in efficiency increase with the amount of contextual information (as the number of contexts increases). Vertical axis shows the difference in cross-entropy when the number of contexts is 1 and when the number of contexts is greater than 1. Horizontal axis shows each of the four conditions (the four context sizes). Note that the difference for condition 1 is zero as there is only a single context."}
+img1 <- grid::rasterGrob(as.raster(png::readPNG("figs/fig1.png")))
+img2 <- grid::rasterGrob(as.raster(png::readPNG("figs/fig2.png")))
+gridExtra::grid.arrange(grobs=list(img1, img2), ncol=2)
+```
+
 ### Simulation set-up
 
 #### Basic ingredients
@@ -207,6 +216,12 @@ Piantadosi et al. (2012) framed their theory in terms of conditional entropy fol
 
 ### Summary
 Piantadosi et al. (2012) argued that it is useful to re-use low-cost linguistic forms for multiple meanings when they can be disambiguated in context. Using our speaker-listener cross-entropy measure of efficiency we showed that optimal languages are more likely to have ambiguous items when context is informative. Further, we showed that the impact of being able to disambiguate language (having access to $p(m|c_i)$) is increasingly efficient as the amount of common-ground (context) increases.\par
+
+```{r plot-optimal-use, fig.env = "figure*", fig.pos = "h", fig.width=6, fig.height=3, fig.align = "center", set.cap.width=T, num.cols.cap=2, fig.cap = "Left facet shows the empirical probability that our speaker used an ambiguous utterance as a function of discourse position. As the discourse proceeds, the speaker is more likely to use an ambiguous term. Right face shows the probability the listener assigns to the current topic of conversation. That is, P(c|D) which is inferred by reasoning about the discourse history."}
+img3 <- grid::rasterGrob(as.raster(png::readPNG("figs/fig3.png")))
+img4 <- grid::rasterGrob(as.raster(png::readPNG("figs/fig4.png")))
+gridExtra::grid.arrange(grobs=list(img3, img4), ncol=2)
+```
 
 ## Experiment 2: Rational-pragmatic speakers use ambiguity efficiently
 
@@ -256,33 +271,6 @@ Place acknowledgments (including funding information) in a section at
 the end of the paper.
 
 # References 
-
-```{r fig1, fig.env="figure", fig.pos = "H", fig.align = "center", fig.width=4, fig.height=4, fig.cap = "Optimal languages are more likely to contain ambiguous items as amount of contextual information increases. Vertical axis shows the proportion of optimal languages that contain ambiguity. Horizontal axis shows the number of contexts in each condition (1-4). Red-line represents the optimal langauge under our Zipfian cross-entropy objective while the blue and red lines show optimal languages under speaker- and listener-only consideration."}
-img <- png::readPNG("figs/fig1.png")
-grid::grid.raster(img)
-```
-
-```{r fig2, fig.env="figure", fig.pos = "H", fig.align = "center", fig.width=2.5, fig.height=3, fig.cap = "The gains in efficinecy increase as the amount of contextual information increases. Vertical axis shows the difference in cross-entropy for when context is informative. Horizontal axis shows each of the four conditions. Note that the difference for condition 1 is zero as thered is only a single context." }
-img <- png::readPNG("figs/fig2.png")
-grid::grid.raster(img)
-```
-
-```{r fig3, fig.env="figure", fig.pos = "H", fig.align = "center", fig.width=2.5, fig.height=3, fig.cap = "R plot" }
-img <- png::readPNG("figs/fig3.png")
-grid::grid.raster(img)
-```
-
-```{r fig4, fig.env="figure", fig.pos = "H", fig.align = "center", fig.width=2.5, fig.height=3, fig.cap = "R plot" }
-img <- png::readPNG("figs/fig4.png")
-grid::grid.raster(img)
-```
-
-
-```{r fig5, fig.env="figure", fig.pos = "H", fig.align = "center", fig.width=2.5, fig.height=3, fig.cap = "R plot" }
-img <- png::readPNG("figs/fig5.png")
-grid::grid.raster(img)
-```
-
 
 ```{r}
 # References will be generated automatically by Pandoc and included here.
