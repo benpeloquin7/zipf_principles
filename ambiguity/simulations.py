@@ -2,12 +2,15 @@
 
 from collections import defaultdict
 import pandas as pd
+import logging
 import numpy as np
 import tqdm
 
 from .matrix import *
 from .objectives import *
 from .utils import *
+
+logging.getLogger().setLevel(logging.INFO)
 
 
 class Simulation:
@@ -60,6 +63,8 @@ class OrderedSimulation(Simulation):
             meaning_order_fn_name,
             speaker_k=1,
             listener_k=1,
+            speaker_alpha=1,
+            listener_alpha=1,
             verbose=False):
         all_results = []
         pbar = tqdm.tqdm(total=n_sims * verbose)
@@ -74,6 +79,9 @@ class OrderedSimulation(Simulation):
             N_MEANINGS = 4
             p_utterances = np.random.dirichlet([utterance_order_fn(i) for i in range(N_UTTERANCES)])
             p_meanings = np.random.dirichlet([meaning_order_fn(i) for i in range(N_MEANINGS)])
+            p_cs = np.random.dirichlet(
+                [1. for _ in range(n_contexts)])
+            p_cs = p_cs.reshape((n_contexts, 1))
             # Populate contexts
             contexts = [p_meanings]
 
@@ -83,8 +91,10 @@ class OrderedSimulation(Simulation):
                 # new_p_m = np.random.dirichlet([meaning_order_fn(k) for k in range(N_MEANINGS)])
                 contexts.append(np.roll(contexts[0], i+1))
             # Baseline model (context isn't informative so we take)
-            # p(m) = \sum_c p(m, c)p(c)
+            # p(m) = \sum_c p(m|c)p(c)
             p_m_no_context = np.array(contexts)
+            p_m_no_context *= p_cs
+
             p_m_no_context = \
                 np.sum(p_m_no_context, axis=0) / np.sum(p_m_no_context)
 
@@ -96,84 +106,93 @@ class OrderedSimulation(Simulation):
             for idxs, m in all_matrices:
                 for context_id, context in enumerate(contexts):
                     p_meanings_ = context
-                    # Pragmatic speaker / listener
-                    m_speaker = col_multiply(speaker(m, p_utterances, p_meanings_, 1., speaker_k), p_meanings_)
-                    m_listener = row_multiply(listener(m, p_utterances, p_meanings_, 1., listener_k), p_utterances)
-                    # non-Pragmatic speaker / listener
-                    m_speaker_no_context = col_multiply(speaker(m, p_utterances, p_m_no_context, 1., speaker_k), p_m_no_context)
-                    m_listener_no_context = row_multiply(listener(m, p_utterances, p_m_no_context, 1., listener_k), p_utterances)
-                    # For computing log(p(u)) in \sum_{u, m}P_s(u, m)*log(p(u))
+
+                    # P_{speaker}(u, m | c)
+                    m_speaker = col_multiply(speaker(m, p_utterances,
+                                                     p_meanings_,
+                                                     speaker_alpha,
+                                                     speaker_k),
+                                             p_meanings_)
+                    # P_{listener}(u, m | c)
+                    m_listener = row_multiply(listener(m, p_utterances,
+                                                       p_meanings_,
+                                                       listener_alpha,
+                                                       listener_k),
+                                              p_utterances)
+                    # p(u)
+                    # in \sum_{u, m}P_s(u, m)*log(p(u))
                     m_simple_speaker_costs = row_multiply(m, p_utterances)
-                    # For computing log(L(m|u)) in \sum_{u, m}P_s(u, m)*log(L(m|u))
-                    m_simple_listener_costs = listener(m, p_utterances, p_meanings_, 1., listener_k)
+                    # L(m|u)
+                    # in \sum_{u, m}P_s(u, m)*log(L(m|u))
+                    m_simple_listener_costs = listener(m, p_utterances,
+                                                       p_meanings_,
+                                                       listener_alpha,
+                                                       listener_k)
 
                     # Note we assume uniform prior over contexts
                     # thus (1 / len(n_contexts))
-                    p_c = (1. / n_contexts)
-                    if idxs in d_results:
-                        # Normalise to ensure valid probability distributions.
-                        # (handle languages that have assigned
-                        # 0 to particular utterance.)
-                        m_speaker = normalize_m(m_speaker)
-                        m_listener = normalize_m(m_listener)
-                        m_speaker_no_context = normalize_m(m_speaker_no_context)
-                        m_listener_no_context = normalize_m(m_listener_no_context)
+                    # p_c = (1. / n_contexts)
 
-                        # compute costs
-                        d_results[idxs]['ce'] += \
-                            ce.compute_cost(m_speaker, m_listener) * \
-                            p_c
-                        d_results[idxs]['kl'] += \
-                            kl.compute_cost(m_speaker, m_listener) * \
-                            p_c
-                        d_results[idxs]['ferrer'] += \
-                            ferrer.compute_cost(m_speaker, m_listener) * \
-                            p_c
-                        d_results[idxs]['sym_ce'] += \
-                            sym_ce.compute_cost(m_speaker, m_listener) * \
-                            p_c
-                        d_results[idxs]['speaker_entropy'] += \
-                            ce.compute_cost(m_speaker, m_simple_speaker_costs) * \
-                            p_c
-                        d_results[idxs]['listener_entropy'] += \
-                            ce.compute_cost(m_speaker, m_simple_listener_costs) * \
-                            p_c
-                        d_results[idxs]['base_speaker_listener_ce'] += \
-                            ce.compute_cost(m_speaker_no_context, m_listener_no_context) * \
-                            p_c
-                    else:
-                        # Set initial values
-                        d_results[idxs]['ce'] = \
-                            ce.compute_cost(m_speaker, m_listener) * \
-                            p_c
-                        d_results[idxs]['kl'] = \
-                            kl.compute_cost(m_speaker, m_listener) * \
-                            p_c
-                        d_results[idxs]['ferrer'] = \
-                            ferrer.compute_cost(m_speaker, m_listener) * \
-                            p_c
-                        d_results[idxs]['sym_ce'] = \
-                            sym_ce.compute_cost(m_speaker, m_listener) * \
-                            p_c
-                        d_results[idxs]['speaker_entropy'] = \
-                            ce.compute_cost(m_speaker, m_simple_speaker_costs) * \
-                            p_c
-                        d_results[idxs]['listener_entropy'] = \
-                            ce.compute_cost(m_speaker, m_simple_listener_costs) * \
-                            p_c
-                        d_results[idxs]['base_speaker_listener_ce'] = \
-                            ce.compute_cost(m_speaker_no_context, m_listener_no_context) * \
-                            p_c
-                        # Tracking meta-data
-                        d_results[idxs]['sim_id'] = sim_id
-                        d_results[idxs]['contains_ambiguity'] = contains_ambiguities(idxs, N_UTTERANCES, N_MEANINGS)
-                        d_results[idxs]['n_contexts'] = len(contexts)
-                        d_results[idxs]['utterance_order_fn_name'] = utterance_order_fn_name
-                        d_results[idxs]['meaning_order_fn_name'] = meaning_order_fn_name
-                        d_results[idxs]['speaker_k'] = speaker_k
-                        d_results[idxs]['listener_k'] = listener_k
-                        d_results[idxs]['n_utterances'] = N_UTTERANCES
-                        d_results[idxs]['n_meanings'] = N_MEANINGS
+                    # TODO (20190116) Do I need to do this normalization below?
+                    # Normalise to ensure valid probability distributions.
+                    # (handle languages that have assigned
+                    # 0 to particular utterance.)
+
+
+
+                    # Safe-keeping for clean-use below
+                    args = [('ce', m_speaker, m_listener, ce),
+                            ('kl', m_speaker, m_listener, kl),
+                            ('ferrer', m_speaker, m_listener, ferrer),
+                            ('sym_ce', m_speaker, m_listener, sym_ce),
+                            ('speaker_entropy', m_speaker,
+                             m_simple_speaker_costs, ce),
+                            ('listener_entropy', m_speaker,
+                             m_simple_listener_costs, ce)]
+                            # ('base_speaker_listener_ce', m_speaker_no_context,
+                            #  m_listener_no_context, ce)]
+
+                    # Record objectives
+                    for arg in args:
+                        typ, s, l, objective_fn = arg
+                        if (idxs in d_results) and (typ in d_results[idxs]):
+                            d_results[idxs][typ] += \
+                                objective_fn.compute_cost(s, l) * \
+                                p_cs.flatten()[context_id]
+                        else:
+                            d_results[idxs][typ] = \
+                                objective_fn.compute_cost(s, l) * \
+                                p_cs.flatten()[context_id]
+
+                # Track meta-data
+                d_results[idxs]['sim_id'] = sim_id
+                d_results[idxs]['contains_ambiguity'] = \
+                    contains_ambiguities(idxs, N_UTTERANCES, N_MEANINGS)
+                d_results[idxs]['n_contexts'] = len(contexts)
+                d_results[idxs]['utterance_order_fn_name'] = \
+                    utterance_order_fn_name
+                d_results[idxs]['meaning_order_fn_name'] = \
+                    meaning_order_fn_name
+                d_results[idxs]['speaker_k'] = speaker_k
+                d_results[idxs]['listener_k'] = listener_k
+                d_results[idxs]['n_utterances'] = N_UTTERANCES
+                d_results[idxs]['n_meanings'] = N_MEANINGS
+
+                # Non-pragmatic S and L's
+                # they don't have access to the conditionals so
+                # p(m|c) is just p(m) = \sum_c p(m|c)
+                # non-pragmatic speaker / listener
+                m_speaker_no_context = \
+                    col_multiply(speaker(m, p_utterances, p_m_no_context,
+                                         speaker_alpha, speaker_k),
+                                 p_m_no_context)
+                m_listener_no_context = \
+                    row_multiply(listener(m, p_utterances,
+                                          p_m_no_context, listener_alpha,
+                                          listener_k), p_utterances)
+                d_results[idxs]['base_speaker_listener_ce'] = \
+                    ce.compute_cost(m_speaker_no_context,
+                                    m_listener_no_context)
 
             # Track objectives
             min_ce = np.Inf
@@ -199,24 +218,21 @@ class OrderedSimulation(Simulation):
                 if results['base_speaker_listener_ce'] < min_base_ce:
                     min_base_ce = results['base_speaker_listener_ce']
 
-            # Set mins
+            # Record minimums
             for idxs, results in d_results.items():
-                results['is_min_ce'] = True \
-                    if results['ce'] == min_ce else False
-                results['is_min_kl'] = True \
-                    if results['kl'] == min_kl else False
-                results['is_min_ferrer'] = True \
-                    if results['ferrer'] == min_ferrer else False
-                results['is_min_sym_ce'] = True \
-                    if results['sym_ce'] == min_sym_ce else False
-                results['is_min_speaker_entropy'] = True \
-                    if results['speaker_entropy'] == min_speaker_entropy else False
-                results['is_min_listener_entropy'] = True \
-                    if results['listener_entropy'] == min_listener_entropy else False
-                results['is_min_base_speaker_listener_ce'] = True \
-                    if results['base_speaker_listener_ce'] == min_base_ce else False
+                results['is_min_ce'] = results['ce'] == min_ce
+                results['is_min_kl'] = results['kl'] == min_kl
+                results['is_min_ferrer'] = results['ferrer'] == min_ferrer
+                results['is_min_sym_ce'] = results['sym_ce'] == min_sym_ce
+                results['is_min_speaker_entropy'] = \
+                    results['speaker_entropy'] == min_speaker_entropy
+                results['is_min_listener_entropy'] = \
+                    results['listener_entropy'] == min_listener_entropy
+                results['is_min_base_speaker_listener_ce'] = \
+                    results['base_speaker_listener_ce'] == min_base_ce
             all_results.append(d_results)
             pbar.update()
+
         pbar.close()
         return all_results
 
@@ -227,7 +243,7 @@ class VaryContextSimulations(Simulation):
     Evidence backing claim 1 in Peloquin, Goodman & Frank (2018)
 
     Each context uses the same meaning distribution, but shifts
-    the probabilies.
+    the probabilities.
 
     E.g.
     meanigs = [1, 2, 3
@@ -245,6 +261,8 @@ class VaryContextSimulations(Simulation):
             meaning_order_fn_name,
             speaker_k=1,
             listener_k=1,
+            speaker_alpha=1,
+            listener_alpha=1,
             verbose=False):
         simulator = OrderedSimulation()
         context_1_params = [n_sims, 1,
@@ -252,29 +270,39 @@ class VaryContextSimulations(Simulation):
                             utterance_order_fn_name,
                             meaning_order_fn,
                             meaning_order_fn_name,
-                            speaker_k, listener_k]
+                            speaker_k, listener_k,
+                            speaker_alpha, listener_alpha]
         context_2_params = [n_sims, 2,
                             utterance_order_fn,
                             utterance_order_fn_name,
                             meaning_order_fn,
                             meaning_order_fn_name,
-                            speaker_k, listener_k]
+                            speaker_k, listener_k,
+                            speaker_alpha, listener_alpha]
         context_3_params = [n_sims, 3,
                             utterance_order_fn,
                             utterance_order_fn_name,
                             meaning_order_fn,
                             meaning_order_fn_name,
-                            speaker_k, listener_k]
+                            speaker_k, listener_k,
+                            speaker_alpha, listener_alpha]
         context_4_params = [n_sims, 4,
                             utterance_order_fn,
                             utterance_order_fn_name,
                             meaning_order_fn,
                             meaning_order_fn_name,
-                            speaker_k, listener_k]
-        params = [context_1_params, context_2_params, context_3_params, context_4_params]
+                            speaker_k, listener_k,
+                            speaker_alpha, listener_alpha]
+        params = [
+            context_1_params,
+            context_2_params,
+            context_3_params,
+            context_4_params
+        ]
         results = []
         pbar = tqdm.tqdm(total=len(params)*verbose)
         for param in params:
+            logging.info("Running context sim with {} contexts".format(param[1]))
             d = simulator.run(*param)
             d_processed = self.process_results(d)
             results.append(pd.DataFrame(d_processed))
