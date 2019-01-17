@@ -5,17 +5,19 @@ from simulations import VaryContextSimulations, RecursiveSimulation
 CONTEXT_RUN_PARAMS = {
     'simulator': VaryContextSimulations,
     'run_params': {
-        'n_sims': 100,
+        'n_sims': 500,
         'utterance_order_fn': lambda x: 1.,
         'utterance_order_fn_name': 'uniform',
         'meaning_order_fn': lambda x: 1.,
         'meaning_order_fn_name': 'uniform',
+        'speaker_alpha': 1.,
+        'listener_alpha': 1.,
         'speaker_k': 1,
         'listener_k': 1,
         'verbose': False
     },
     # utterance_order_fn_name-meaning_order_fn_name-speaker_k-listener_k
-    'out_file_name': 'uniform_uniform_1_1_100.csv'
+    'out_file_name': 'uniform_uniform_1_1_500.csv'
 }
 
 
