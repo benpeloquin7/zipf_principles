@@ -3,3 +3,4 @@
 *.pyc
 */notebooks/
 .Rproj.user
+paper/
