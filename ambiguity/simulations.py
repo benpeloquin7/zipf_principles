@@ -86,11 +86,12 @@ class OrderedSimulation(Simulation):
             contexts = [p_meanings]
 
             for i in range(1, n_contexts):
-                # new_p_m populates a totally new prior over meanigns.
                 # Currently not using...
+                # new_p_m populates a totally new prior over meanigns.
                 # new_p_m = np.random.dirichlet([meaning_order_fn(k) for k in range(N_MEANINGS)])
                 contexts.append(np.roll(contexts[0], i+1))
-            # Baseline model (context isn't informative so we take)
+            # Baseline model
+            # (context isn't informative so we take)
             # p(m) = \sum_c p(m|c)p(c)
             p_m_no_context = np.array(contexts)
             p_m_no_context *= p_cs
@@ -113,32 +114,23 @@ class OrderedSimulation(Simulation):
                                                      speaker_alpha,
                                                      speaker_k),
                                              p_meanings_)
+
                     # P_{listener}(u, m | c)
                     m_listener = row_multiply(listener(m, p_utterances,
                                                        p_meanings_,
                                                        listener_alpha,
                                                        listener_k),
                                               p_utterances)
-                    # p(u)
+                    # p(u) term
                     # in \sum_{u, m}P_s(u, m)*log(p(u))
                     m_simple_speaker_costs = row_multiply(m, p_utterances)
-                    # L(m|u)
+
+                    # L(m|u) term
                     # in \sum_{u, m}P_s(u, m)*log(L(m|u))
                     m_simple_listener_costs = listener(m, p_utterances,
                                                        p_meanings_,
                                                        listener_alpha,
                                                        listener_k)
-
-                    # Note we assume uniform prior over contexts
-                    # thus (1 / len(n_contexts))
-                    # p_c = (1. / n_contexts)
-
-                    # TODO (20190116) Do I need to do this normalization below?
-                    # Normalise to ensure valid probability distributions.
-                    # (handle languages that have assigned
-                    # 0 to particular utterance.)
-
-
 
                     # Safe-keeping for clean-use below
                     args = [('ce', m_speaker, m_listener, ce),
@@ -149,8 +141,6 @@ class OrderedSimulation(Simulation):
                              m_simple_speaker_costs, ce),
                             ('listener_entropy', m_speaker,
                              m_simple_listener_costs, ce)]
-                            # ('base_speaker_listener_ce', m_speaker_no_context,
-                            #  m_listener_no_context, ce)]
 
                     # Record objectives
                     for arg in args:
