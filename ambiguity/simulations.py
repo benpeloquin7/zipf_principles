@@ -1,12 +1,9 @@
 """simulations.py"""
 
-from collections import defaultdict
 import pandas as pd
-import logging
-import numpy as np
 import tqdm
 
-from .matrix import *
+from .agents import *
 from .objectives import *
 from .utils import *
 
@@ -323,6 +320,8 @@ class VaryContextSimulations(Simulation):
         return d_results
 
 
+# Below is old code that needs updating and is not used in the
+# paper "Pragmatic interactions lead to efficient language structure and use"
 class RecursiveSimulation(Simulation):
     """Simulation focuses on benefits of pragmatic recursion.
 

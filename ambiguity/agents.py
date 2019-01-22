@@ -1,4 +1,4 @@
-"""matrix.py
+"""agents.py
 
 Define all experiments in terms of matrix operations.
 
