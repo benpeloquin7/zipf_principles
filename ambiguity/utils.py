@@ -28,6 +28,31 @@ def all_meanings_available_filter(M):
     return all(np.sum(M, axis=0) > 0.)
 
 
+def all_utterances_used_filter(M):
+    """
+
+    Parameters
+    ----------
+    M: np.array
+        A boolean matrix.
+
+    Returns
+    -------
+    bool
+        True if all meanings can be talked about (each col as some val.)
+
+    """
+    return all(np.sum(M, axis=1) > 0.)
+
+
+def all_utterances_meanings_used_filter(M):
+    """Combined version .
+
+    """
+    return all_meanings_available_filter(M) and all_utterances_used_filter(M)
+
+
+
 def is_valid_matrix(M, filter_fn):
     """Filter on boolean matrices.
 
@@ -74,6 +99,14 @@ def generate_all_boolean_matrices(m, n, n_true):
     for idxs in all_subsets:
         matrices.append((idxs, idxs2matrix(idxs, m, n)))
     return matrices
+
+
+def generate_all_boolean_matrices_upto(m, n, n_true):
+    """Generate all M x N boolean matrices from n to n_true ones."""
+    langs = []
+    for curr_n_true in range(n, n_true + 1):
+        langs.extend(generate_all_boolean_matrices(m, n, curr_n_true))
+    return langs
 
 
 def matrix2idxs(M):
