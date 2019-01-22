@@ -1,6 +1,18 @@
+
+# Python
 .idea/
 */__pycache__/
 *.pyc
 */notebooks/
+
+# R
 .Rproj.user
+*.Rproj
+*.Rhistory
+
+# Particular
 paper/
+practice-sims/
+
+# Tex
+*.tex
