@@ -81,13 +81,16 @@ class OrderedSimulation(Simulation):
             p_meanings = np.random.dirichlet([meaning_order_fn(i) for i in range(N_MEANINGS)])
             p_cs = np.random.dirichlet(
                 [1. for _ in range(n_contexts)])
+            # Uniform prior over contexts (NOT USING)
+            # p_cs = np.array([1. for _ in range(n_contexts)])
+            # p_cs = p_cs / np.sum(p_cs)
             p_cs = p_cs.reshape((n_contexts, 1))
             # Populate contexts
             contexts = [p_meanings]
 
             for i in range(1, n_contexts):
                 # Currently not using...
-                # new_p_m populates a totally new prior over meanigns.
+                # new_p_m populates a totally new prior over meanings.
                 # new_p_m = np.random.dirichlet([meaning_order_fn(k) for k in range(N_MEANINGS)])
                 contexts.append(np.roll(contexts[0], i+1))
             # Baseline model
@@ -95,13 +98,13 @@ class OrderedSimulation(Simulation):
             # p(m) = \sum_c p(m|c)p(c)
             p_m_no_context = np.array(contexts)
             p_m_no_context *= p_cs
-
             p_m_no_context = \
                 np.sum(p_m_no_context, axis=0) / np.sum(p_m_no_context)
 
-            # All matrices
+            # Generate all valid matrices (as defined by filter)
             all_matrices = \
-                [(idxs, m) for (idxs, m) in generate_all_boolean_matrices(N_UTTERANCES, N_MEANINGS, N_MEANINGS) if all_meanings_available_filter(m)]
+                [(idxs, m) for (idxs, m) in generate_all_boolean_matrices_upto(N_UTTERANCES, N_MEANINGS, N_MEANINGS+1) \
+                 if all_utterances_meanings_used_filter(m)]
 
             d_results = defaultdict(dict)
             for idxs, m in all_matrices:
@@ -121,6 +124,7 @@ class OrderedSimulation(Simulation):
                                                        listener_alpha,
                                                        listener_k),
                                               p_utterances)
+
                     # p(u) term
                     # in \sum_{u, m}P_s(u, m)*log(p(u))
                     m_simple_speaker_costs = row_multiply(m, p_utterances)
@@ -131,6 +135,12 @@ class OrderedSimulation(Simulation):
                                                        p_meanings_,
                                                        listener_alpha,
                                                        listener_k)
+
+                    # Require m_speaker and m_listener are valid
+                    # joint distributions
+                    # (although expect some rounding error).
+                    assert(np.abs(np.sum(m_speaker) - 1) < 1e-05)
+                    assert (np.abs(np.sum(m_listener) - 1) < 1e-05)
 
                     # Safe-keeping for clean-use below
                     args = [('ce', m_speaker, m_listener, ce),
@@ -255,6 +265,8 @@ class VaryContextSimulations(Simulation):
             listener_alpha=1,
             verbose=False):
         simulator = OrderedSimulation()
+
+        # Note we examine 1-4 contexts
         context_1_params = [n_sims, 1,
                             utterance_order_fn,
                             utterance_order_fn_name,
