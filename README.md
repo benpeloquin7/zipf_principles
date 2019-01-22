@@ -12,7 +12,7 @@ To generate the simulated data for this section run from repo root.
 ```
 >>> python -m ambiguity.run --sim-type context --out-dir your_output_dir
 ```
-or you may access the datasets [here](need url)
+or you may access the simulation data from the paper [here](https://web.stanford.edu/~bpeloqui/Projects/zipf_principles/data/).
 
 #### Files:
 
