@@ -1,6 +1,5 @@
 """language_constructs.py"""
 
-import itertools as it
 from .utils import *
 
 

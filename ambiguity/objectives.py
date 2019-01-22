@@ -13,11 +13,6 @@ class Objective:
     def __init__(self):
         pass
 
-    @staticmethod
-    def _check_matrix(m):
-        return True
-        #return np.abs(np.sum(m) - 1) < 1e-3
-
     def compute_cost(self, m1, m2):
         raise NotImplementedError()
 
