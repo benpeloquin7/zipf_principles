@@ -376,15 +376,31 @@ var SDiscourseUnaware = cache(function(world, T, data) {
   })
 })
 
+// Baseline speaker only samples according to topic
+var SBaseline = cache(function(world, T, data) {
+  Infer({
+    model() {
+      var utterance = utterancesPrior()
+      return {'utterance': utterance}
+    }
+  })
+})
+
+
 //
 // Discourse speaker
 // Note (BP): Would be interseting to think about this as a speaker agent
 // 
 
+var speakerType = getRData("resultType")
+var useSpeaker = speakerType == "discourseAware" ? SDiscourseAware :
+  speakerType == "discourseUnaware" ? SDiscourseUnaware : SBaseline
+
+
 var d = []
 var speakerFn = cache(function(T, d) {
   var world = sampleWorldFromTopic(T)()
-  return d.concat([sample(SDiscourseAware(world, T, d))['utterance']])
+  return d.concat([sample(useSpeaker(world, T, d))['utterance']])
 })
 
 var speakerRecurse = function(T, d, n) {
@@ -541,6 +557,7 @@ var getListenerInferences = function(utterances) {
 // and corresponding state of listener inferences about topics.
 //
 var processUtterances = function(speakerData, 
+                                  speakerType,
                                   listenerInferences, 
                                   crossEntropies,
                                   naiveCrossEntropies,
@@ -551,6 +568,7 @@ var processUtterances = function(speakerData,
                                   speakerCosts) {
   var dMap = map(function(x) {
     return {
+      'speakerType': speakerType,
       'utteranceNum': x, 
       'utterance': speakerData[x], 
       'T1': listenerInferences[x]['T1'],
@@ -581,7 +599,7 @@ var processUtterances = function(speakerData,
 // --------
 // List of dicts
 //
-var runFn = function(resultType) {
+var runFn = function(speakerType) {
   var utteranceList = speakerRecurse(targetDistr, [], nUtterances)
   var listenerInferences = getListenerInferences(utteranceList)
   var crossEntropies = trackObjective(crossEntropy, utteranceList, SDiscourseAware, LDiscourseAware)
@@ -592,6 +610,7 @@ var runFn = function(resultType) {
   var naiveListenerCosts = trackObjective(listenerEffort, utteranceList, SDiscourseAware, LDiscourseUnaware, false)
   var speakerCosts = trackObjective(speakerEffort, utteranceList, SDiscourseAware, LDiscourseAware)
   return processUtterances(utteranceList, 
+    speakerType,
     listenerInferences, 
     crossEntropies, 
     naiveCrossEntropies,
@@ -604,5 +623,5 @@ var runFn = function(resultType) {
 
 // 
 // run
-//
-runFn('contextAware')
+// Note speakerType defined line :384
+runFn(speakerType)
