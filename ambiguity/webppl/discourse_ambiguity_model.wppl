@@ -78,6 +78,10 @@ var getTopicNameDistr = function(topicName) {
   return topicDistr[topicName]
 }
 
+var litMeaning_ = function(utterance, world) {
+  return utterance == world['d']
+}
+
 var litMeaning = function(utterance, world) {
   return utterance == world['d']
 }
@@ -144,6 +148,18 @@ var cost = function(utterance) {
 
 // RSA agents
 //
+var S0 = function(world) {
+  Infer({
+    model() {
+      var utterance = utterancesPrior()
+      var meaning = litMeaning(utteranceMeaning(utterance), world)
+      factor(meaning ? 0 : -Infinity)
+      return utterance
+    }
+  })
+}
+
+
 var L0 = cache(function(utterance) {
   Infer({
     model() {
@@ -380,7 +396,7 @@ var SDiscourseUnaware = cache(function(world, T, data) {
 var SBaseline = cache(function(world, T, data) {
   Infer({
     model() {
-      var utterance = utterancesPrior()
+      var utterance = sample(S0(world))
       return {'utterance': utterance}
     }
   })
@@ -447,6 +463,9 @@ var crossEntropy = function(speaker, listener, data) {
     var p_t_given_d = listenerTopicDistrPosterior(data)
     // p(u)
     var p_u = utterancesDistr
+    // console.log(m, T)
+    // console.log(p_m_given_u.score({'estWorld': m, 'estTopicDistrName': T}), p_u.score(u), p_t_given_d.score(T))
+
     return p_m_given_u.score({'estWorld': m, 'estTopicDistrName': T}) + 
       p_u.score(u) +
       p_t_given_d.score(T)
@@ -600,15 +619,17 @@ var processUtterances = function(speakerData,
 // List of dicts
 //
 var runFn = function(speakerType) {
+  var useSpeaker = speakerType == "discourseAware" ? SDiscourseAware :
+    speakerType == "discourseUnaware" ? SDiscourseUnaware : SBaseline
   var utteranceList = speakerRecurse(targetDistr, [], nUtterances)
   var listenerInferences = getListenerInferences(utteranceList)
-  var crossEntropies = trackObjective(crossEntropy, utteranceList, SDiscourseAware, LDiscourseAware)
-  var naiveCrossEntropies = trackObjective(crossEntropy, utteranceList, SDiscourseAware, LDiscourseUnaware)
-  var KLs = trackObjective(KL, utteranceList, SDiscourseAware, LDiscourseAware)
-  var naiveKLs = trackObjective(KL, utteranceList, SDiscourseAware, LDiscourseUnaware)
-  var listenerCosts = trackObjective(listenerEffort, utteranceList, SDiscourseAware, LDiscourseAware)
-  var naiveListenerCosts = trackObjective(listenerEffort, utteranceList, SDiscourseAware, LDiscourseUnaware, false)
-  var speakerCosts = trackObjective(speakerEffort, utteranceList, SDiscourseAware, LDiscourseAware)
+  var crossEntropies = trackObjective(crossEntropy, utteranceList, useSpeaker, LDiscourseAware)
+  var naiveCrossEntropies = trackObjective(crossEntropy, utteranceList, useSpeaker, LDiscourseUnaware)
+  var KLs = trackObjective(KL, utteranceList, useSpeaker, LDiscourseAware)
+  var naiveKLs = trackObjective(KL, utteranceList, useSpeaker, LDiscourseUnaware)
+  var listenerCosts = trackObjective(listenerEffort, utteranceList, useSpeaker, LDiscourseAware)
+  var naiveListenerCosts = trackObjective(listenerEffort, utteranceList, useSpeaker, LDiscourseUnaware, false)
+  var speakerCosts = trackObjective(speakerEffort, utteranceList, useSpeaker, LDiscourseAware)
   return processUtterances(utteranceList, 
     speakerType,
     listenerInferences, 
