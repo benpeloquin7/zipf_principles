@@ -57,22 +57,10 @@ grid::grid.raster(img)
 ```
 
 ### Reference games
-Zipf’s example of optimal speaker- and listener-languages took the form of a reference game (similar to those described by Wittgenstein). We adopt that formulation here, assuming these communication games as our basic unit of analysis. In this setting, speakers and listeners are aware of a set of objects $M$, which we will refer to as *meanings* and are knowledgeable about the set of possible signals $U$ (*utterances*) that can be used to refer to a given meaning (see Figure 1 for an example reference game). Utterances may have different relative costs, operationalized via a prior over utterances $P(U)$. Similarly, meanings differ in the relative degree to which they need to be talked about, operationalized as a prior over meanings $P(M)$. Note that the prior over meanings are analogous to the *need probabilities* assumed in previous work Regier, Kemp & Kay [-@RegierKempKay2015a]. We consider a set of contexts $C$ with an associated prior $P(C)$. Contexts describe different orderings of the underlying meaning prior, formalized as different conditional distributions over meanings e.g. $p(M|C=c_i)$. Finally, we consider a set of communicative events $e \in E$ where $<u, m> = e$ is a tuple of utterance, meaning pairs.\par
+Zipf’s example of optimal speaker- and listener-languages took the form of a reference game (similar to those described by Wittgenstein). We adopt that formulation here, assuming these communication games as our basic unit of analysis. In this setting, speakers and listeners are aware of a set of objects $M$, which we will refer to as *meanings* and are knowledgeable about the set of possible signals $U$ (*utterances*) that can be used to refer to a given meaning (see Figure 1 for an example reference game). Utterances may have different relative costs, operationalized via a prior over utterances $P(U)$. Similarly, meanings differ in the relative degree to which they need to be talked about, operationalized as a prior over meanings $P(M)$\footnote{The prior over meanings are analogous to the \textit{need probabilities} assumed in previous work Regier, Kemp \& Kay (2015).}. We consider a set of contexts $C$ with an associated prior $P(C)$. Contexts describe different orderings of the underlying meaning prior, formalized as different conditional distributions over meanings e.g. $p(M|C=c_i)$. Finally, we consider a set of communicative events $e \in E$ where $<u, m> = e$ is a tuple of utterance, meaning pairs.\par
 
 ### Languages
-A language $\ell$ defines the set of semantic mappings between utterance and meanings. For example, in a world with three utterances $U = \{u_1, u_2, u_3\} \text{ and three meanings }M = \{m_1, m_2, m_3\}$ the boolean matrix 
-
-\begin{center}
-\begin{tabular}{ c | c c c } 
-& $m_1$ & $m_2$ & $m_3$ \\
-\hline
-$u_1$ & 1 & 1 & 0 \\
-$u_2$ & 0 & 1 & 0 \\
-$u_3$ & 0 & 0 & 1 \\
-\end{tabular}
-\end{center}
-
-describes the literal semantics of $\ell$.
+A language $\ell$ defines the set of semantic mappings between utterance and meanings. For example, figure 1 contains four utterances $U = \{\text{blue}, \text{green}, \text{square}, \text{circle}\} \text{ and three meanings }M = \{\text{green-square}, \text{blue-square}, \text{green-circle}\}$. The boolean matrix describes the literal semantics of the language $\ell$. Note that will consider language to "contain ambiguous items" if there is at least one utterance $u \in U$ which can apply to multiple meanings (i.e. $|[[u_i]]| > 1$). For example, in Figure 1 both the words "blue" and "green" are ambigous so we would say that $\ell$ contains ambiguity.
 
 ### Speakers and listeners
 The Rational Speech-act framework (RSA) is computational-level theory of pragmatic language use. RSA can largely be understood as a formalization of essential Gricean pragmatic principles -- interlocutors reason about one another and their shared context. For this reason, we adopt RSA as our representational framework to operationalize Gricean (rational and pragmatic) speaker-listeners [@Grice1975a]. We refer the reader to Section 1 of our supplementary materials for a more detailed description of basic RSA speaker-listener definitions, and to Goodman & Frank [-@GoodmanFrank2016a] for an overview of its appliations. We limit the current discussion to essential, high-level details of the framework.\par
@@ -86,10 +74,20 @@ $$P_{listener}(u, m; \ell) = L(m|u; \ell)p(u)$$
 Zipf (1949) proposed that the particular distributional properties found in natural language emerge from competing speaker and listener pressures. We operationalize this in equation (1) -- the efficiency of a linguistic system $\ell$ being used by speaker and listener agents $S$ and $L$ is the sum of the expected speaker and listener effort to communicate over all possible communicative events $E$.\par
 
 \begin{equation}
-  \text{Efficiency}(S, L, \ell) = \mathbb{E}_{e \sim P(E)}[\text{speaker effort}] + \mathbb{E}_{e \sim P(E)}[\text{listener effort}]
+\begin{split}
+  \text{Efficiency}(S, L, \ell) = \mathbb{E}_{e \sim P(E)}[\text{speaker effort}] \\+ \mathbb{E}_{e \sim P(E)}[\text{listener effort}]
+\end{split}
 \end{equation}
 
-We assume that speaker effort is the negative log probability of an utterance $-log_2(p(U))$, listener effort is the negative log probability of the listener's conditional $-log_2(L(M|U))$, and that events $e = <u, m>$ are sampled according the to following generative model -- some object occurs in the world with probability $p(M=m)$, the speaker attempts to refer to that object by sampling from her conditional distribution $S(u|m)$ (i.e. $e \sim p(m)S(u|m)$). Using these basic ingredients we arrive at the following objective:
+We assume that speaker effort is the negative log probability of an utterance (surprisal) -- intuitively, the number of bits needed to encode the utterance $u$. This particular formalization of speaker-cost is general enough to accommodate a range of instantiations that might in theory be related to production difficult via articulation effort, cognitive effort related to lexical access, etc [@BennettGoodman2015a].\par
+
+$$\text{speaker effort} = -log_2(p(u))$$
+
+We assume listener effort is the negative log probability of the listener's conditional $-log_2(L(M|U))$. This operationalization of listener effort is intuitively related to existing work in sentence processing in which word difficulty during comprehension is proportional to surprisal [@Hale2001a; @Levy2008a].
+
+$$\text{listener effort} = -log_2(L(m|u; \ell))$$
+
+Finally, we assume that events $e = <u, m>$ are sampled according the to following generative model -- some object occurs in the world with probability $p(M=m)$, the speaker attempts to refer to that object by sampling from her conditional distribution $S(u|m)$ (i.e. $e \sim p(m)S(u|m)$). Using these basic ingredients we arrive at the following objective:
 
 \begin{equation}
 \begin{split}
@@ -100,10 +98,10 @@ This is the simply the cross-entropy between the speaker and listener joint dist
 \begin{equation}
 \begin{split}
   = \mathbb{E}_{P_{speaker}}[-log_2(P_{listener})] \\
-  = H_{cross}(P_{speaker}, P_{listener})
+  = H_{cross}(P_{speaker}, P_{listener}; \ell)
 \end{split}
 \end{equation}
-From an information-theoretic perspective this objective is intuitive. Cross-entropy gives us a measure of dissimilarity between two distributions -- the average number of bits required to communicate under one distribution, given that the “true” distribution differs. In our case, this is the difference between the joint distribution assumed by the speaker $P_{speaker}$ and listener $P_{listener}$. An "efficient" language $\ell$ used by a set of a pair of speaker-listeners will have properties which minimize this objective. For a complete derivation and its componetns we refer the reader to Section 2.1 of our supplementary materials. \par
+From an information-theoretic perspective this objective is intuitive. Cross-entropy gives us a measure of dissimilarity between two distributions -- the average number of bits required to communicate under one distribution, given that the “true” distribution differs. In our case, this is the difference between the joint distribution assumed by the speaker $P_{speaker}$ and listener $P_{listener}$. An "efficient" language $\ell$ used by a set of a pair of speaker-listeners will have properties which minimize this objective. For a complete derivation and its components we refer the reader to Section 2.1 of our supplementary materials.\par
 
 # Simulating the communicative function of ambiguity
 
@@ -129,7 +127,7 @@ This in turn, leads to an update to our linguistic efficiency objective as we no
 
 ## Simulation set-up
 
-We conduct $N=2000$ simulations. For each simulation we enumerate the set of *valid* languages in which $|U|=|M|=4$. Note that a language $\ell \in L$ is "valid" so long as each possible meaning in $m \in M$ can be referred to by at least one form $u \in U$ (every column of $\ell$ has some non-zero assignment) and each form maps to at least one meaning (every column has some non-zero assignment). For a given simulation the goal is to find the language $\ell^*$ which minimizes our cross-entropy objective.\par
+We conduct $N=2000$ simulations. For each simulation we enumerate the set of *valid* languages in which $|U|=|M|=4$. Note that a language $\ell \in L$ is "valid" so long as each possible meaning in $m \in M$ can be referred to by at least one form $u \in U$ (every column of $\ell$ has some non-zero assignment) and each form maps to at least one meaning (every column has some non-zero assignment). For a given simulation the goal is to find the language $\ell^*$ which minimizes our cross-entropy objective and then check to see if that language contains ambiguity.\par
 
 Recall that language efficiency is both a function of the particular semantic mappings induced by that language, the speaker and listener agents ($S$ and $L$), as well as the utterance ($P(U)$), meaning ($P(M)$), and context priors ($P(C)$). Rather than assume particular structure for our utterance, meaning, and context prior distributions, for each simulation we generate $P(U) \sim \text{Dir}(1, |U|)$, $P(M) \sim \text{Dir}(1, |M|)$, and $P(C) \sim \text{Dir}(1, |C|)$ where $\text{Dir}(1, k)$ specifies the uniform Dirichlet distribution over a $k$-dimensional probability vector.\par
 
