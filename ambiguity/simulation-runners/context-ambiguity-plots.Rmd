@@ -1,0 +1,90 @@
+---
+title: "ambiguity_context_analysis"
+author: "Ben"
+date: "11/12/2018"
+output: html_document
+---
+
+```{r libraries}
+rm(list = ls())  # clear workspace
+library(cowplot)
+library(tidyverse)
+library(ggthemes)
+```
+
+```{r read-files}
+fp <- '/Users/benpeloquin/Data/zipf_principles/ambiguity/runs-20190121/uniform_uniform_1_1_500.csv'
+df <- read.csv(fp)
+```
+
+
+## Claim 1 - the more contexts the more useful ambiguity is.
+```{r plot1-a}
+p1 <- df %>%
+  select(sim_id, idxs, n_contexts, speaker_k,
+         utterance_order_fn_name, is_min_ce,
+         is_min_listener_entropy, is_min_speaker_entropy, 
+         contains_ambiguity) %>%
+  gather(objective, val, c(is_min_ce, is_min_listener_entropy, is_min_speaker_entropy)) %>%
+  # filter(objective=='base_speaker_listener_ce') %>%
+  mutate(val=as.logical(val),
+         contains_ambiguity=as.logical(contains_ambiguity)) %>%
+  filter(val) %>%  # only look at 'optimal languages'
+  group_by(objective, n_contexts) %>%
+  summarise(n=n(),  # number of optimal languages (there can be ties)
+            prop_ambiguous=mean(contains_ambiguity),
+            # Binomial CIs
+            ci_high = prop_ambiguous + qnorm(0.975)*sqrt((prop_ambiguous*(1 - prop_ambiguous))/n),
+            ci_low=prop_ambiguous - qnorm(0.975)*(sqrt((prop_ambiguous*(1-prop_ambiguous))/n))) %>%
+  ungroup() %>%
+  # Normal approximation isn't great when we have proportions so 
+  # close to 1. so just rounding down slightly. This is a little
+  # loosey-goosey, but does not impact the overall narrative
+  # in a significant way
+  # mutate(ci_high=ifelse(ci_high > 1, 1, ci_high)) %>%
+  mutate(objective=ifelse(objective=='is_min_ce', 'Cross-entropy',
+                          ifelse(objective=='is_min_listener_entropy', 'Optimal Listener', 'Optimal Speaker'))) %>%
+  rename(Objective=objective) %>%
+  ggplot(aes(x=n_contexts, y=prop_ambiguous, col=Objective)) +
+    geom_line(size=1.5) +
+    geom_errorbar(aes(ymin=ci_low, ymax=ci_high), width=0.05, size=1, alpha=0.7) +
+    ylab("Percent optimal languages \n containing ambiguity") +
+    xlab("Number of contexts (|C|)") +
+    theme_few()
+    # In case we want to embed legend in the plot, but not really necessary...
+    # theme(legend.position = c(0.8, 0.4),
+    #       legend.background = element_rect(colour = 'grey', fill = 'white', linetype='solid'))
+```
+
+```{r plot1-b}
+p2 <- df %>%
+  select(sim_id, idxs, n_contexts, is_min_ce, ce, base_speaker_listener_ce, contains_ambiguity) %>%
+  filter(as.logical(is_min_ce)) %>%
+  mutate(ce_minus_base=ce-base_speaker_listener_ce) %>%
+  ungroup %>%
+  group_by(n_contexts) %>%
+  summarise(n=n(),
+            diff=mean(ce_minus_base),
+            ci_high=diff + 1.96*sd(ce_minus_base)/sqrt(n),
+            ci_low=diff - 1.96*sd(ce_minus_base)/sqrt(n)) %>%
+  ggplot(aes(x=n_contexts, y=diff)) +
+    geom_bar(stat='identity', position='dodge', alpha=0.8) +
+    geom_errorbar(aes(ymin=ci_low, ymax=ci_high), width=0.1, col='black', alpha=0.8) +
+    theme_few() +
+    ylab("Difference in cross-entropy\n aware vs unaware of context") +
+    xlab("Number of contexts (|C|)")
+```
+
+Saves single fig plot.
+```{r saving}
+# plot_grid(p1, p2, labels = c("A", "B"), align = "h")
+# ggsave(file.path(getwd(), "../../paper/figs/fig1.png"), width=10, height=3)
+ggsave(file.path(getwd(), "../../paper/figs/fig1.png"), plot=p1, width=7, height=3)
+```
+
+Save grid plot
+```{r saving}
+# plot_grid(p1, p2, labels = c("A", "B"), align = "h")
+# ggsave(file.path(getwd(), "../../paper/figs/fig1.png"), width=10, height=3)
+```
+

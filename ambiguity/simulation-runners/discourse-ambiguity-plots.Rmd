@@ -1,0 +1,173 @@
+---
+title: "Discourse-ambiguity-plots"
+author: "Ben"
+date: "1/24/2019"
+output: html_document
+---
+
+Plotting functionality for Simulation 2 plots in "The interactions of rational, pragmatic agentslead to efficient language structure and use."
+
+```{r libraries, message=FALSE, warning=FALSE}
+rm(list = ls())  # clear workspace
+
+library(cowplot)
+library(doParallel)
+library(entropy)
+library(ggthemes)
+library(tidyverse)
+library(zoo)
+
+source(file.path(getwd(), "../utils.R"))
+```
+
+```{r load-data}
+# Note you should point to the correct locations on your local machine
+# reach out to bpeloqui@stanfor.edu for this data.
+fpPreprocessed <- "/Users/benpeloquin/Data/zipf_principles/discourse_ambiguity/df_preprocessed_20190124.csv"
+fpSims <- "/Users/benpeloquin/Data/zipf_principles/discourse_ambiguity/df_simsCmbd_20190124.csv"
+
+df_preProcessedSims <- read.csv(fpPreprocessed)
+df_simCmbd <- read.csv(fpSims)
+```
+
+Empirical probability of ambiguous utterance.
+```{r plot-ambiguity-use}
+# Get legend
+p1_temp <- df_preProcessedSims %>%
+  rename(model=resultType) %>%
+  mutate(model=ifelse(model=='baseline', "Non-Pragmatic",
+                      ifelse(model=="discourseUnaware", "Partial Pragmatic", "Full Pragmatic"))) %>%
+  mutate(Model=factor(model, level=c("Non-Pragmatic", "Partial Pragmatic", "Full Pragmatic"))) %>%
+  ggplot(aes(x=utteranceNum, y=probAmb, col=Model)) +
+    geom_line(aes(col=Model)) +
+    geom_errorbar(aes(ymin=probAmb-2*stdAmb, ymax=probAmb+2*stdAmb), alpha=0.5, width=0.4, col='black') +
+    geom_point(size=2, alpha=0.8) +
+    ylab("Probability \nof ambiguous utterance") +
+    xlab("Utterance position in discourse") +
+    theme_few() +
+    theme(legend.background = element_rect(colour = 'grey', fill = 'white', linetype='solid'))
+legend <- get_legend(p1_temp)
+
+p1 <- df_preProcessedSims %>%
+  rename(model=resultType) %>%
+  mutate(model=ifelse(model=='baseline', "Non-Pragmatic",
+                      ifelse(model=="discourseUnaware", "Partial Pragmatic", "Full Pragmatic"))) %>%
+  mutate(Model=factor(model, level=c("Non-Pragmatic", "Partial Pragmatic", "Full Pragmatic"))) %>%
+  ggplot(aes(x=utteranceNum, y=probAmb, col=Model)) +
+    geom_line(aes(col=Model)) +
+    geom_errorbar(aes(ymin=probAmb-2*stdAmb, ymax=probAmb+2*stdAmb), alpha=0.5, width=0.4, col='black') +
+    geom_point(size=1.5, alpha=0.8) +
+    ylab("Proportion \n ambiguous") +
+    xlab("Utterance position in discourse") +
+    theme_few() +
+    theme(legend.position="None",
+          axis.title.x=element_blank(),
+          axis.text.x=element_blank(),
+          axis.ticks.x=element_blank(),
+          plot.margin = unit(c(0, 0, 0, 0), "cm"))
+```
+
+Cross-entropy measure
+```{r cross-entropy}
+p2 <- df_simCmbd %>%
+  rename(model=speakerType) %>%
+  mutate(model=ifelse(model=='baseline', "Non-Pragmatic",
+                      ifelse(model=="discourseUnaware", "Partial Pragmatic", "Full Pragmatic"))) %>%
+  mutate(Model=factor(model, level=c("Non-Pragmatic", "Partial Pragmatic", "Full Pragmatic"))) %>%
+  mutate(CE=-CE) %>%
+  group_by(Model, utteranceNum) %>%
+  summarise(n=n(),
+            meanCE= mean(CE),
+            ci_high=meanCE + qnorm(.975)*(sd(CE)/sqrt(n)),
+            ci_low=meanCE - qnorm(.975)*(sd(CE)/sqrt(n))) %>%
+  ggplot(aes(x=utteranceNum, y=meanCE, col=Model)) +
+    geom_line() +
+    geom_errorbar(aes(ymin=ci_low, ymax=ci_high), alpha=0.5, width=0.4, col='black') +
+    geom_point(size=1.5, alpha=0.8) +
+    theme_few() +
+    ylab('Average S/L cross-entropy') +
+    xlab("Utterance position in discourse") +
+    theme_few() +
+    theme(legend.position="None",
+          plot.margin = unit(c(0, 0, 0, 0.5), "cm"))
+```
+
+Speaker cost.
+```{r speaker-costs}
+p3 <- df_simCmbd %>%
+  rename(model=speakerType) %>%
+  mutate(model=ifelse(model=='baseline', "Non-Pragmatic",
+                      ifelse(model=="discourseUnaware", "Partial Pragmatic", "Full Pragmatic"))) %>%
+  mutate(Model=factor(model, level=c("Non-Pragmatic", "Partial Pragmatic", "Full Pragmatic"))) %>%
+  mutate(speakerCosts=-speakerCosts) %>%
+  group_by(Model, utteranceNum) %>%
+  summarise(n=n(),
+            mean_speakerCosts=mean(speakerCosts),
+            ci_high=mean_speakerCosts + qnorm(.975)*(sd(speakerCosts)/sqrt(n)),
+            ci_low=mean_speakerCosts - qnorm(.975)*(sd(speakerCosts)/sqrt(n))) %>%
+  ggplot(aes(x=utteranceNum, y=mean_speakerCosts, col=Model)) +
+    geom_line() +
+    geom_errorbar(aes(ymin=ci_low, ymax=ci_high), alpha=0.5, width=0.4, col='black') +
+    geom_point(size=1.5, alpha=0.8) +
+    theme_few() +
+    ylab('Average \n Speaker cost') +
+    xlab("Utterance position in discourse") +
+    theme_few() +
+    theme(legend.position="None",
+          plot.margin=unit(c(0, 0, 0, 0), "cm"))
+```
+
+Utterance position 3 delta in CE objective
+```{r}
+p_embed <- df_simCmbd %>%
+  rename(model=speakerType) %>%
+  mutate(model=ifelse(model=='baseline', "Non-Pragmatic",
+                      ifelse(model=="discourseUnaware", "Partial Pragmatic", "Full Pragmatic"))) %>%
+  mutate(Model=factor(model, level=c("Non-Pragmatic", "Partial Pragmatic", "Full Pragmatic"))) %>%
+  mutate(CE=-CE) %>%
+  group_by(Model, utteranceNum) %>%
+  summarise(n=n(),
+            meanCE=mean(CE),
+            ci_high=meanCE + qnorm(.975)*(sd(CE)/sqrt(n)),
+            ci_low=meanCE - qnorm(.975)*(sd(CE)/sqrt(n))) %>%
+  filter(utteranceNum == 29) %>%
+  ggplot(aes(x=Model, y=meanCE, fill=Model)) +
+    geom_bar(stat='identity', position=position_dodge()) +
+    # geom_line() +
+    geom_errorbar(aes(ymin=ci_low, ymax=ci_high), position=position_dodge(), alpha=0.8, width=0.1) +
+    ylab('Average S/L cross-entropy') +
+    xlab("CE at last utterance in discourse") +
+    theme_few() +
+    theme(legend.position="None")
+```
+
+Paper figure.
+```{r}
+# Embed legend
+p2a <- ggdraw() +
+  draw_plot(p2) +
+  draw_plot(legend, 0.55, 0.6, 0.4, 0.4)
+p1a <- plot_grid(p1, NULL, p3, align='hv', ncol=1, labels=c("A", "", "B"), rel_heights=c(1, -0.14, 1))
+# Embed legend
+p_grid <- plot_grid(p1a, p2a, ncol=2, labels=c('', 'C'))
+ggsave(file.path(getwd(), "../../paper/figs/discourse_grid_plot.png"), plot=p_grid, width=7.8, height=3.2)
+```
+
+
+Additional plots
+
+Listener belief update.
+```{r}
+p4 <- df_preProcessedSims %>%
+  mutate(ci_hi=avgT1+qnorm(0.975)*(sdT1/sqrt(n)),
+         ci_lo=avgT1-qnorm(0.975)*(sdT1/sqrt(n))) %>%
+  rename(model=resultType) %>%
+  ggplot(aes(x=utteranceNum, y=avgT1)) +
+    geom_smooth(method='loess', alpha=0.5, col='red') +
+    geom_errorbar(aes(ymin=ci_lo, ymax=ci_hi), width=0.4, alpha=0.6) +
+    geom_point(size=2, alpha=0.75) +
+    ylab("Probability of\n current topic P(C=c|D)") +
+    xlab("Utterance position in discourse") +
+    theme_few()  +
+    facet_grid(~model)
+```

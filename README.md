@@ -4,17 +4,37 @@ Code and paper for cogsci 2019.
 
 ### Abstract
 
-We discuss a framework for studying how the distributional properties of linguistic systems emerge from in-the-moment interactions of speakers and listeners. Our work takes Zipfian notions of lexicon-level efficiency as a starting point, connecting these ideas to Gricean notions of conversational-level efficiency. To do so, we begin by deriving an objective function for measuring the communicative efficiency of linguistic systems and then examining the behavior of this objective in a series of simulations focusing on the communicative function of ambiguity in language. These simulations suggest that rational pragmatic agents will produce communicatively efficient systems.
+Languages display a diverse set of distributional regularities such as the relation between a word's frequency and rank in a corpus, the distribution of dependency lengths, or the presence of lexical properties such as ambiguity. We discuss a framework for studying how these properties emerge from in-the-moment interactions of rational, pragmatic speakers and listeners. Our work takes Zipfian notions of lexicon-level efficiency as a starting point, connecting these ideas to Gricean notions of conversational-level efficiency. To do so, we derive an objective function for measuring the communicative efficiency of linguistic systems and then examining the behavior of this objective in a series of simulations focusing on the communicative function of ambiguity in language. These simulations suggest that rational pragmatic agents will produce communicatively efficient systems and that interactions between such agents provide a framework for examining efficient properties of language more broadly.
 
-## Efficient language design
+## Simulation 1: Optimal languages contain ambiguity when context is informative
+
+
+### Generate simulation data
 
 To generate the simulated data for this section run from repo root.
 ```
 >>> python -m ambiguity.run --sim-type context --out-dir your_output_dir
 ```
-or you may access the simulation data from the paper [here](https://web.stanford.edu/~bpeloqui/Projects/zipf_principles/data/).
+or the simulation data from the paper is available upon request (bpeloqui@stanford.edu)
 
-#### Files:
+### Generate plots
+
+To generate the plots run code in `ambiguity/simulation-runners/context-ambiguity-plots.Rmd` pointing to local file-paths.
+
+
+## Simulation 2: Rational, pragmatic speakers use ambiguity efficiently
+
+
+### Generate simulation data
+
+To generate the simulated data run code chuncks in `ambiguity/simulation-runners/discourse-ambiguity.Rmd` or the simulation data from the paper is available upon request.
+
+### Generate plots
+
+To generate the plots run code in `ambiguity/simulation-runners/discourse-ambiguity-plots.Rmd` pointing to local file-paths.
+
+
+#### Repo organization:
 
 `zipf_principles/ambiguity/...`
 
@@ -24,14 +44,15 @@ or you may access the simulation data from the paper [here](https://web.stanford
 * `simulations.py` primary simulation infrastructure. Note that we run "context" simulations in the current work.
 * `agents.py` basic matrix manipulation as well as matrix-defined RSA agents.
 * `utils.py` general usefulities.
+* `simulation-runners` contains simulation run and plotting functionalit (detailed above).
+* `zipf_principles/ambiguity/webppl/...`
+  * `discourse_ambiguity_model.wppl` contains model code. For best viewing set interpreter to javascript.
+  * `notebooks/discourse-ambiguity.Rmd` contains simulation run and plotting code.
 
 ## Efficient language use
 
-Code for discourse simulations is written in [webppl](http://webppl.org/).
+Code for context simulations is written in python, code for discourse simulations is written in [webppl](http://webppl.org/).
 
 #### Files:
 
-`zipf_principles/ambiguity/webppl/...`
 
-* `discourse_ambiguity_model.wppl` contains model code. For best viewing set interpreter to javascript.
-* `notebooks/discourse-ambiguity.Rmd` contains simulation run and plotting code.

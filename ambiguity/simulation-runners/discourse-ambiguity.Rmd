@@ -1,0 +1,158 @@
+---
+title: "Discourse-ambiguity"
+author: "Ben"
+date: "11/9/2018"
+output: html_document
+---
+
+Simulation 2 run code for "The interactions of rational, pragmatic agentslead to efficient language structure and use." Note that we make use of the `rwebppl` package to interface with webppl. Modeling and discourse generation are contained in the "ambiguity/webppl" folder.
+
+```{r libraries, message=FALSE, warning=FALSE}
+rm(list = ls())  # clear workspace
+
+library(cowplot)
+library(doParallel)
+library(entropy)
+library(ggthemes)
+library(tidyverse)
+library(zoo)
+
+source(file.path(getwd(), "../utils.R"))
+```
+
+Load model.
+```{r getModel}
+fPath <- file.path(getwd(), '../webppl/discourse_ambiguity_model.wppl')
+m <- getModelFile(fPath)
+```
+
+Setup.
+```{r runFn}
+# Single run function
+runAmbiguity <- createRunFn(m)
+runAmbiguityFn <- function(i, targetDistr, nUtterances, resultType, alpha, recursionLevel) {
+  dTemp <- data.frame(targetDistr=targetDistr, 
+                      nUtterances=nUtterances, 
+                      resultType=resultType, 
+                      alpha=alpha, 
+                      recursionLevel=recursionLevel)
+  df <- runAmbiguity(dTemp) %>%
+    mutate(runNum=i, targetDistr=targetDistr, alpha=alpha, resultType=resultType, recursionLevel=recursionLevel)
+  df
+}
+  
+# Multiple runs function
+runAmibguityCorpus <- function(topic, alpha, resultType, recursionLevel, nUtterances, nSims) {
+  # Parallelization setup
+  no_cores <- detectCores() - 1
+  cl <- makeCluster(no_cores, type='FORK')
+  registerDoParallel(cl)
+  
+  # Run sims
+  ptm <- proc.time()
+  sims <- foreach(i=seq(1, nSims), .packages=c('dplyr', 'rwebppl'), .combine=rbind) %dopar% 
+    runAmbiguityFn(i,
+                   targetDistr=topic,
+                   nUtterances=nUtterances,
+                   resultType=resultType,
+                   alpha=alpha,
+                   recursionLevel=recursionLevel)
+  stopCluster(cl)
+  etm <- proc.time() - ptm
+  
+  # Preprocess for entropy calculations.
+  binSize <- 1
+  df_binned <- addUtteranceBins(sims, nUtterances=nUtterances, binSize=binSize)
+  df_filled <- fillUtteranceProportions(df_binned, binSize) %>%
+    mutate(recursionLevel=recursionLevel)
+  list(sims, df_filled)
+}
+```
+
+# Run sims
+```{r}
+# Note to use cached results you must hace access to the data. Data is available on request bpeloqui@stanford.edu.
+fpPreprocssed <- "/Users/benpeloquin/Data/zipf_principles/discourse_ambiguity/df_preprocessed_20190124.csv"
+fpSims <- "/Users/benpeloquin/Data/zipf_principles/discourse_ambiguity/df_simsCmbd_20190124.csv"
+
+topic <- 'T1'
+nUtterances <- 30
+alpha=8
+nSims <- 100
+
+simsBaseline <- runAmibguityCorpus(
+  topic=topic,
+  alpha=8,
+  resultType='baseline',
+  recursionLevel=1,
+  nUtterances=nUtterances,
+  nSims=nSims)
+
+simsUnaware <- runAmibguityCorpus(
+  topic=topic,
+  alpha=8,
+  resultType='discourseUnaware',
+  recursionLevel=1,
+  nUtterances=nUtterances,
+  nSims=nSims)
+
+simsAware <- runAmibguityCorpus(
+  topic=topic,
+  alpha=8,
+  resultType='discourseAware',
+  recursionLevel=1,
+  nUtterances=nUtterances,
+  nSims=nSims)
+
+simsAmbiguityCorpusUnaware <- simsUnaware[[1]]
+dfAmbiguityCorpusUnaware <- simsUnaware[[2]]
+simsAmbiguityCorpusAware <- simsAware[[1]]
+dfAmbiguityCorpusAware <- simsAware[[2]]
+simsAmbiguityCorpusBaseline <- simsBaseline[[1]]
+dfAmbiguityCorpusBaseline <- simsBaseline[[2]]
+
+# Combine data
+simsCmbd <- rbind(simsAmbiguityCorpusUnaware,
+                  simsAmbiguityCorpusAware,
+                  simsAmbiguityCorpusBaseline)
+# Write raw sims data
+write.csv(simsCmbd, fpSims)
+                
+dfAmbiguityCorpusCmbd <- rbind(dfAmbiguityCorpusUnaware,
+                               dfAmbiguityCorpusAware,
+                               dfAmbiguityCorpusBaseline)
+
+# Pre-process
+preProcessedSims <- simsCmbd %>% 
+  group_by(resultType, alpha) %>%
+  mutate(isAmbiguous=(utterance=='x' | utterance=='y'),
+         isX=utterance=='x',
+         isA=utterance=='a',
+         isB=utterance=='b') %>%
+  group_by(resultType, alpha, utteranceNum) %>%
+  summarise(n=n(),
+            numAmb=sum(isAmbiguous),
+            probAmb=numAmb/n,
+            stdAmb=sqrt(probAmb*(1-probAmb)/n),
+            numX=sum(isX),
+            probX=numX/n,
+            stdX=sqrt(probX*(1-probX)/n),
+            numA=sum(isA),
+            probA=numA/n,
+            stdA=sqrt(probA*(1-probA)/n),
+            numB=sum(isB),
+            probB=numB/n,
+            stdB=sqrt(probB*(1-probB)/n),
+            avgT1=mean(T1),
+            sdT1=sd(T1),
+            avgT2=mean(T2),
+            sdT2=sd(T2),
+            avgT3=mean(T3),
+            sdT3=sd(T3),
+            avgT4=mean(T4),
+            sdT4=sd(T4))
+# Cache data
+write.csv(preProcessedSims, fpPreprocssed)
+df_preProcessedSims <- preProcessedSims
+```
+
