@@ -114,7 +114,6 @@ We provide a toy example of their argument here. Say we have two objects in the 
 In the following experiments we explore two aspects of Piantadosi’s claim. First, we examine the efficient language *structure* aspect of their claim, exploring when the optimal linguistic system $\ell^*$ is most likely to contain ambiguous lexical items. In the second experiment, we explore an efficient language *use* aspect of the claim -- at what point in a conversation is it useful for a speaker to use ambiguous lexical material?\par
 
 ```{r plot-optimal-langs, fig.env = "figure*", fig.pos = "h", fig.width=8, fig.height=2, fig.align = "center", set.cap.width=T, num.cols.cap=2, fig.cap = "Optimal languages are more likely to contain ambiguous items as the amount of contextual information increases. Vertical axis shows the proportion of optimal languages that contain ambiguity. Horizontal axis shows the number of contexts in each condition (1-4). Red-line represents the optimal language under our Zipfian cross-entropy objective while the blue and red lines show optimal languages under speaker- and listener-only consideration."}
-
 img <- png::readPNG("figs/fig1.png")
 grid::grid.raster(img)
 ```
@@ -158,6 +157,7 @@ We consider consider a single language $\ell$, which contains both ambiguous and
 Over the course of a discourse, $D$ the listener tries to infer both the current topic, $c_{current}$, as well as the particular meaning $m$ of a given utterance $u$. That is, we consider updated listener and speakers ($L(m, c|u,D;\ell)$, $S(u|m,c,D;\ell)$). Note that both the speaker and listener can track the history of previous utterances $D$. Importantly, an agent can attempt to infer the current topic of conversation $c_{current}$ using the discourse history $D$ (see SI section 3 for more detail).\par
 
 ```{r plot-optimal-use, fig.env = "figure*", fig.pos = "h", fig.width=6, fig.height=2.5, fig.align = "center", set.cap.width=T, num.cols.cap=2, fig.cap = "(A) shows the empirical probability that our speaker used an ambiguous utterance as a function of discourse position. (B) shows speaker effort across the three models. (C) shows the Cross-Entropy objective under our three speaker models."}
+
 img <- png::readPNG("figs/discourse_grid_plot.png")
 grid::grid.raster(img)
 ```
