@@ -1,4 +1,4 @@
-# Pragmatic interactions lead to efficient language structure and use
+# The interactions of rational, pragmatic agents lead to efficient language structure and use
 
 Code and paper for cogsci 2019.
 
