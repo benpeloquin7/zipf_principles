@@ -68,10 +68,10 @@ the relation between a word's frequency and rank in a corpus, the
 distribution of dependency lengths, or the presence of lexical
 properties such as ambiguity. We discuss a framework for studying how
 these properties emerge from in-the-moment interactions of rational,
-pragmatic speakers and listeners. Our work takes Zipfian notions of
+pragmatic speakers and listeners. Our work takes notions of
 lexicon-level efficiency as a starting point, connecting these ideas to
-Gricean notions of conversational-level efficiency. To do so, we derive
-an objective function for measuring the communicative efficiency of
+notions of conversational-level efficiency. To do so, we derive an
+objective function for measuring the communicative efficiency of
 linguistic systems and then examining the behavior of this objective in
 a series of simulations focusing on the communicative function of
 ambiguity in language. These simulations suggest that rational pragmatic
@@ -137,7 +137,7 @@ But how does such optimization take place? The example given by Zipf
 world \(m\). They choose some utterance \(u\) to transmit this intended
 meaning, \(u \rightarrow m\). The listener attempts to reconstruct this
 intended meaning given the transmitted utterance, \(m \rightarrow u\).
-Other functionalist projects have also assumed this basic reference game
+Other functionalist projects have assumed this basic reference game
 setting (Piantadosi et al., 2011; Regier et al., 2015) and this
 simplification of the communicative act has proven productive in
 theoretical (Ferrer-i-Cancho, 2018), simulation-based (Kirby, Griffiths,
@@ -149,35 +149,31 @@ speakers' pragmatic reasoning in the moment. Under a Gricean treatment
 of pragmatics, speakers and listeners are assumed to follow a set of
 conversational maxims in which they cooperate to transfer information
 (Grice, 1975). These maxims appear to emerge from efficiency concerns,
-however (Horn, 1984).\par
+however (Horn, 1984). A primary target of the current work is to
+formalize this connection, by providing a framework for deriving
+system-level efficiencies from local, interaction behavior. Our claim is
+that to understand an ``efficient'' property of a system we need to
+consider \emph{how} that property is \emph{used} efficiently.
+Additionally, any quantitative description of ``efficiency'' should be a
+function of both the system and users.\par
 
-In this work, we present a step toward formalizing the framing presented
-above -- connecting Zipfian notions of efficient language structure to
-Gricean notions of rational conversation (Grice, 1975). To do so
-minimally requires three basic ingredients -- (1) a language property
-we'd like to explain, (2) a framework for describing in-the-moment
-interactions of speaker-listeners, and (3) some measure of linguistic
-efficiency. For the current project we focus on the ``communicative
-function of ambiguity'' for our property -- translating the
-functionalist theory pursued by Piantadosi, et al. (2011) into our
-framework. To model local, conversational interactions (2) we adopt the
-Rational Speech-act framework (RSA) (Frank \& Goodman, 2012; Goodman \&
-Frank, 2016). Finally, (3) we derive an objective function for measuring
-language efficiency in the reference game setting.\par
-
-The current work examines the question, ``how does having
-\textit{lexical ambiguity} make using language \(\ell\) more or less
-useful for communication''? We begin with a high-level introduction to
-the modelling framework introducing the basic ingredients we will need
-to represent language as repeated reference games. We derive anobjective
-function for measuring the efficiency of linguistic systems in this
-setting. We move on to two case-studies exploring the questions posed
-above -- examining the efficiency of ambiguity from a language design
-and language use perspective. The contributions of this work is to show
-how the reference game framework, in combination with formal modles of
-communication, can be used to study questions at a range of different
-timescales, from language use in-the-moment to language change across
-historical time.\par
+In the current work we provide a case-study for the kind of framing
+presented above. We choose a property of languages that could, in
+principle, vary freely, but shows strong regularities across languages.
+The explanadum is why this regularity holds. We examine lexical
+ambiguity as our property, extending ideas by Piantadosi et al. (2011).
+We define a novel measure of efficiency that depends on the
+interactional behavior of interlocutors. For our model of speakers and
+listeners we adopt the Rational Speech Act (RSA) framework, which is
+nicely attested in experimental data on pragmatic interaction. With
+these basic ingredients we have a measure of efficiency given language
+and speaker-listener agents. Finally, we show that the property of
+interest is prevalent in languages that optimize this measure of
+efficiency and also how this property is used efficiently during local
+interaction. The primary contribution of this work is to show how the
+reference game frameowrk, in combination with formal models of
+communication, can be used to connect ideas about system-level
+efficiencies to in-the-moment language use.\par
 
 \section{Exploring efficient language design and use in rational
 pragmatic
@@ -208,11 +204,13 @@ meanings differ in the relative degree to which they need to be talked
 about, operationalized as a prior over meanings
 \(P(M)\)\footnote{The prior over meanings are analogous to the \textit{need probabilities} assumed in previous work Regier, Kemp \& Kay (2015).}.
 We consider a set of contexts \(C\) with an associated prior \(P(C)\).
-Contexts describe different orderings of the underlying meaning prior,
-formalized as different conditional distributions over meanings e.g.
-\(p(M|C=c)\). Finally, we consider a set of communicative events
-\(e \in E\) where \(<u, m> = e\) is a tuple of utterance, meaning
-pairs.\par
+Contexts encode different meaning priors, formalized as separate
+conditional distributions over meanings e.g.
+\(p(M|C=c_i) \neq p(M|C=c_j)\). Finally, we consider a set of
+communicative events \(e \in E\) where \(<u, m> = e\) is a tuple of
+utterance, meaning pairs. Note that in the case of single context
+\(|C|=1\) we simply have a prior over meanings \(p(M)\), a
+simplification we will use in introducing our objective function.\par
 
 \subsubsection{Languages}\label{languages}
 
@@ -241,13 +239,14 @@ of basic RSA speaker-listener definitions, and to Goodman \& Frank
 
 An RSA \emph{speaker agent} defines a conditional distribution over
 utterances, mapping from intended meanings \(M\) to utterances \(U\)
-using \(\ell\). That is, a speaker defines \(P_{speaker}(u|m;\ell)\). We
-will use \(S(u|m;\ell)\) as short-hand throughout. A \emph{listener
-agent} defines a conditional distribution over meanings, mapping from
-utterances \(U\) to meanings \(M\) using \(\ell\). We will use
-\(L(m|u; \ell)\) as shorthand. Note that both speakers and listeners can
-induce joint distributions over the set of all events \(E\), although,
-importantly, these distributions may differ:
+using \(\ell\) in a given context \(c\). That is, a speaker defines
+\(P_{speaker}(u|m; \ell)\). We will use \(S(u|m; \ell)\) as short-hand
+throughout. A \emph{listener agent} defines a conditional distribution
+over meanings, mapping from utterances \(U\) to meanings \(M\) using
+\(\ell\) in a given context \(c\). We will use \(L(m|u; \ell)\) as
+shorthand. Note that both speakers and listeners can induce joint
+distributions over the set of all events \(E\), although, importantly,
+these distributions may differ:
 \[P_{speaker}(u, m; \ell) = S(u|m; \ell)p(m)\]
 \[P_{listener}(u, m; \ell) = L(m|u; \ell)p(u)\]
 
@@ -260,7 +259,12 @@ pressures. We operationalize this objective in equation (1) -- the
 efficiency of a linguistic system \(\ell\) being used by speaker and
 listener agents \(S\) and \(L\) is the sum of the expected speaker and
 listener effort to communicate over all possible communicative events
-\(E\).\par
+\(E\). Note that to simplify the introduction of this objective we
+assume there is just a single context (\(|C|=1\)). In this case
+\(p(C=c)=1\) and there is only distribution over meanings
+(\(p(m|c) = p(m)\)). We provide a more detailed description of this
+derivation in the supplementary materials, both with and without context
+\(C\).\par
 
 \begin{equation}
 \begin{split}
@@ -279,32 +283,24 @@ Goodman, 2018).\par
 \[\text{speaker effort} = -log_2(p(u))\]
 
 We assume listener effort is the negative log probability of the
-listener's conditional \(-log_2(L(M|U))\). This operationalization of
+listener's conditional \(-log_2(L(m|u))\). This operationalization of
 listener effort is intuitively related to existing work in sentence
 processing in which word difficulty during comprehension is proportional
 to surprisal (Hale, 2001; R. Levy, 2008).
 
 \[\text{listener effort} = -log_2(L(m|u; \ell))\]
 
-Finally, we assume that events \(e = <u, m>\) are sampled according the
-to following generative model -- some object occurs in the world with
-probability \(p(M=m)\), the speaker attempts to refer to that object by
-sampling from her conditional distribution \(S(u|m)\) (i.e.
-\(e \sim p(m)S(u|m)\)). Using these basic ingredients we arrive at the
-following objective:
+Importantly, we assume that events \(e = <u, m>\) are sampled according
+the to following generative model -- some object occurs in the world
+with probability \(p(M=m)\), the speaker attempts to refer to that
+object by sampling from her conditional distribution \(S(u|m)\) (i.e.
+\(e \sim p(m)S(u|m)\)). From the ingredients highlighted above, it is
+possible to derive the following objective between the speaker and
+listener joint distributions (see SI 2.2 for a complete derivation).
 
 \begin{equation}
 \begin{split}
-  = \sum_{u, m}P_{speaker}(u, m; \ell)[-log_2(P_{listener}(u, m; \ell))]
-\end{split}
-\end{equation}
-
-This equation is the simply the cross-entropy between the speaker and
-listener joint distributions.
-
-\begin{equation}
-\begin{split}
-  = \mathbb{E}_{P_{speaker}}[-log_2(P_{listener})] \\
+  = -\mathbb{E}_{P_{speaker}}[log_2(P_{listener})] \\
   = H_{cross}(P_{speaker}, P_{listener}; \ell)
 \end{split}
 \end{equation}
@@ -316,9 +312,7 @@ under one distribution, given that the ``true'' distribution differs. In
 our case, this is the difference between the joint distribution assumed
 by the speaker \(P_{speaker}\) and listener \(P_{listener}\). In other
 words, an ``efficient'' language \(\ell\) minimizes the distance between
-what speakers and listener think. For a complete derivation and its
-components we refer the reader to Section 2.1 of our supplementary
-materials.\par
+what speakers and listeners think.
 
 \section{Simulating the communicative function of
 ambiguity}\label{simulating-the-communicative-function-of-ambiguity}
@@ -343,8 +337,9 @@ We provide a toy example of their argument here. Say we have two objects
 in the world \(m_1\) and \(m_2\), and two languages \(\ell_1\) and
 \(\ell_2\). In language \(\ell_1\), the low-cost utterance \(u_1\) can
 be used to refer to both \(m_1\) and \(m_2\) (i.e.
-\([[u_1]]_{\ell_1} = \{m_1, m_2 \}\)). With language \(\ell_2\),
-however, the low cost utterance \(u_1\) can only refer to \(m_1\) and a
+\([[u_1]]_{\ell_1} = \{m_1, m_2 \}\) and
+\([[u_2]]_{\ell_1} = \emptyset\)). With language \(\ell_2\), however,
+the low cost utterance \(u_1\) can only refer to \(m_1\) and a
 higher-cost utterance \(u_2\) can refer to \(m_2\) (i.e.
 \([[u_1]]_{\ell_2} = \{m_1\}\) and \([[u_2]]_{\ell_2} = \{m_2 \}\)).
 While it is cheaper for a speaker to use \(\ell_1\) (because she can
@@ -369,7 +364,7 @@ use ambiguous lexical material?\par
 
 }
 
-\caption[Optimal languages are more likely to contain ambiguous items as the amount of contextual information increases]{Optimal languages are more likely to contain ambiguous items as the amount of contextual information increases. Vertical axis shows the proportion of optimal languages that contain ambiguity. Horizontal axis shows the number of contexts in each condition (1-4). Red-line represents the optimal language under our Zipfian cross-entropy objective while the blue and red lines show optimal languages under speaker- and listener-only consideration.}\label{fig:plot-optimal-langs}
+\caption[Optimal languages are more likely to contain ambiguous items as the amount of contextual information increases]{Optimal languages are more likely to contain ambiguous items as the amount of contextual information increases. Vertical axis shows the proportion of optimal languages that contain ambiguity. Horizontal axis shows the number of contexts in each condition (1-4). Red-line represents the optimal language under our Zipfian cross-entropy objective while the blue and red lines show optimal languages under speaker- and listener-only objectives.}\label{fig:plot-optimal-langs}
 \end{figure*}
 \end{CodeChunk}
 
@@ -377,7 +372,7 @@ use ambiguous lexical material?\par
 is
 informative}\label{simulation-1-optimal-languages-contain-ambiguity-when-context-is-informative}
 
-We adpot the framework above, and (following Piantadosi et al. 2011),
+We adopt the framework above, and (following Piantadosi et al. 2011),
 add \textit{context} (\(C\)). The authors argue that mapping two
 meanings \(m_1\) and \(m_2\) to a single utterance \(u_1\) is useful
 when they can be disambiguated \emph{in context}. In our case we
@@ -415,16 +410,18 @@ agents (\(S\) and \(L\)), as well as the utterance (\(P(U)\)), meaning
 (\(P(M)\)), and context priors (\(P(C)\)). Rather than assume particular
 structure for our utterance, meaning, and context prior distributions,
 for each simulation we generate \(P(U) \sim \text{Dir}(1, |U|)\),
-\(P(M) \sim \text{Dir}(1, |M|)\), and \(P(C) \sim \text{Dir}(1, |C|)\)
-where \(\text{Dir}(1, k)\) specifies the uniform Dirichlet distribution
-over a \(k\)-dimensional probability vector.\par
+\(P(M|C=c) \sim \text{Dir}(1, |M|)\) (a separete conditional
+distribution over meanings for each context \(c\)), and
+\(P(C) \sim \text{Dir}(1, |C|)\) where \(\text{Dir}(1, k)\) specifies
+the uniform Dirichlet distribution over a \(k\)-dimensional probability
+vector.\par
 
 \subsubsection{Context}\label{context}
 
 Following the argument given by Piantadosi et al. (2011), we want to
 assess the impact of \emph{context} on our objective. To do so we
 consider four conditions with \(n=500\) simulations each (that is, 500
-unique sets of \(\{P(U), P(M), P(C)\}\). Our first is a
+unique sets of \(\{P(U), P(M|C), P(C)\}\). Our first is a
 \emph{single-context} condition (\(|C|=1\)) -- there is a only a single
 context describing \(P(M)\). Our second condition contains two-contexts
 (\(|C| = 2\)) -- we consider efficiency under both \(P(M|C=c_1)\) as
@@ -643,8 +640,7 @@ properties of non-referential language can be captured in such a
 framework remains an important target for future work.
 
 \vspace{1em}
-
-\fbox{\parbox[b][][c]{7.3cm}{\centering All experiments, data, and analysis code are available in the public repository for the project: (link will be available upon acceptance)}}
+\fbox{\parbox[b][][c]{7.3cm}{\centering All simulation and analysis code are available in the public repository for the project: (link will be available upon acceptance)}}
 \vspace{1em} \noindent
 
 \section{References}\label{references}
@@ -664,10 +660,6 @@ nature and language}.
 Ferrer-i-Cancho, R. (2018). Optimization models of natural
 communication. \emph{Journal of Quantitative Linguistics}, \emph{25
 (3)}, 207--237.
-
-\hypertarget{ref-FrankGoodman2012a}{}
-Frank, M., \& Goodman, N. (2012). Predicting pragmatic reasoning in
-language games. \emph{Science}, \emph{336}, 998.
 
 \hypertarget{ref-GenzelCharniak2002a}{}
 Genzel, D., \& Charniak, E. (2002). Entropy rate constancy in text. In
