@@ -357,16 +357,24 @@ experiment, we explore an efficient language \emph{use} aspect of the
 claim -- at what point in a conversation is it useful for a speaker to
 use ambiguous lexical material?\par
 
-\begin{CodeChunk}
-\begin{figure*}[h]
+\textbackslash{}begin\{CodeChunk\}
+\textbackslash{}begin\{figure*\}{[}h{]}
 
-{\centering \includegraphics{figs/plot-optimal-langs-1} 
+\{\centering \includegraphics{figs/plot-optimal-langs-1}
 
-}
+\}
 
-\caption[Optimal languages are more likely to contain ambiguous items as the amount of contextual information increases]{Optimal languages are more likely to contain ambiguous items as the amount of contextual information increases. Vertical axis shows the proportion of optimal languages that contain ambiguity. Horizontal axis shows the number of contexts in each condition (1-4). Red-line represents the optimal language under our Zipfian cross-entropy objective while the blue and red lines show optimal languages under speaker- and listener-only objectives.}\label{fig:plot-optimal-langs}
-\end{figure*}
-\end{CodeChunk}
+\textbackslash{}caption{[}Optimal languages are more likely to contain
+ambiguous items as the amount of contextual information
+increases{]}\{Optimal languages are more likely to contain ambiguous
+items as the amount of contextual information increases. Vertical axis
+shows the proportion of optimal languages that contain ambiguity.
+Horizontal axis shows the number of contexts in each condition (1-4).
+Red-line represents the optimal language under our Zipfian cross-entropy
+objective while the blue and red lines show optimal languages under
+speaker- and listener-only objectives. Error bars represent 95\%
+confidence intervals.\}\label{fig:plot-optimal-langs}
+\textbackslash{}end\{figure*\} \textbackslash{}end\{CodeChunk\}
 
 \section{Simulation 1: Optimal languages contain ambiguity when context
 is
@@ -518,16 +526,21 @@ the speaker and listener can track the history of previous utterances
 conversation \(c_{current}\) using the discourse history \(D\) (see SI
 section 3 for more detail).\par
 
-\begin{CodeChunk}
-\begin{figure*}[h]
+\textbackslash{}begin\{CodeChunk\}
+\textbackslash{}begin\{figure*\}{[}h{]}
 
-{\centering \includegraphics{figs/plot-optimal-use-1} 
+\{\centering \includegraphics{figs/plot-optimal-use-1}
 
-}
+\}
 
-\caption[(A) shows the empirical probability that our speaker used an ambiguous utterance as a function of discourse position]{(A) shows the empirical probability that our speaker used an ambiguous utterance as a function of discourse position. (B) shows speaker effort across the three models. (C) shows the Cross-Entropy objective under our three speaker models.}\label{fig:plot-optimal-use}
-\end{figure*}
-\end{CodeChunk}
+\textbackslash{}caption{[}(A) shows the empirical probability that our
+speaker used an ambiguous utterance as a function of discourse
+position{]}\{(A) shows the empirical probability that our speaker used
+an ambiguous utterance as a function of discourse position. (B) shows
+speaker effort across the three models. (C) shows the Cross-Entropy
+objective under our three speaker models. Error bars represent 95\%
+confidence intervals.\}\label{fig:plot-optimal-use}
+\textbackslash{}end\{figure*\} \textbackslash{}end\{CodeChunk\}
 
 We conduct \(N=600\) simulations, generating discourses of length
 \(|D|=30\) utterances with three different speaker models (\(n=200\)
