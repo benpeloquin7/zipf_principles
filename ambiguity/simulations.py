@@ -86,10 +86,13 @@ class OrderedSimulation(Simulation):
             contexts = [p_meanings]
 
             for i in range(1, n_contexts):
-                # Currently not using...
+                # Sample new context from Dirichlet
                 # new_p_m populates a totally new prior over meanings.
-                # new_p_m = np.random.dirichlet([meaning_order_fn(k) for k in range(N_MEANINGS)])
-                contexts.append(np.roll(contexts[0], i+1))
+                new_p_m = np.random.dirichlet([meaning_order_fn(k) for k in range(N_MEANINGS)])
+                # or
+                # New context is simply a permutation
+                # contexts.append(np.roll(contexts[0], i+1))
+                contexts.append(new_p_m)
             # Baseline model
             # (context isn't informative so we take)
             # p(m) = \sum_c p(m|c)p(c)
@@ -121,23 +124,18 @@ class OrderedSimulation(Simulation):
                                                        listener_alpha,
                                                        listener_k),
                                               p_utterances)
-
                     # p(u) term
                     # in \sum_{u, m}P_s(u, m)*log(p(u))
                     m_simple_speaker_costs = row_multiply(m, p_utterances)
 
-                    # L(m|u) term
+                    # L(m|u, c)p(c) term
                     # in \sum_{u, m}P_s(u, m)*log(L(m|u))
-                    m_simple_listener_costs = listener(m, p_utterances,
-                                                       p_meanings_,
-                                                       listener_alpha,
-                                                       listener_k)
+                    m_simple_listener_costs =  \
+                        listener(m, p_utterances,
+                                 p_meanings_,
+                                 listener_alpha,
+                                 listener_k)
 
-                    # Require m_speaker and m_listener are valid
-                    # joint distributions
-                    # (although expect some rounding error).
-                    assert(np.abs(np.sum(m_speaker) - 1) < 1e-05)
-                    assert (np.abs(np.sum(m_listener) - 1) < 1e-05)
 
                     # Safe-keeping for clean-use below
                     args = [('ce', m_speaker, m_listener, ce),
