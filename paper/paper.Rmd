@@ -77,11 +77,11 @@ Zipf (1949) proposed that the particular distributional properties found in natu
 \end{split}
 \end{equation}
 
-We assume that speaker effort is related to the suprisal of an utterance in a particular context\footnote{In the current set of simulations we consider utterances costs as independent from context (ie. $p(u|c)p(c)=p(u)p(c)$).} -- intuitively, the number of bits needed to encode the utterance $u$. This particular formalization of speaker-cost is general enough to accommodate a range of cost instantiations, such as production difficult via articulation effort, cognitive effort related to lexical access, or others [@BennettGoodman2015a].\par
+We assume that speaker effort is related to the surprisal of an utterance in a particular context\footnote{In the current set of simulations we consider utterances costs as independent from context (ie. $p(u|c)p(c)=p(u)p(c)$).} -- intuitively, the number of bits needed to encode the utterance $u$. This particular formalization of speaker-cost is general enough to accommodate a range of cost instantiations, such as production difficult via articulation effort, cognitive effort related to lexical access, or others [@BennettGoodman2015a].\par
 
 $$\text{speaker effort} = -log_2(p(u|c))$$
 
-We assume listener effort is the semantic suprisal of a meaning given an utterance. This operationalization of listener effort is intuitively related to existing work in sentence processing in which word comprehension difficulty is proportional to surprisal [@Hale2001a; @Levy2008a].
+We assume listener effort is the semantic surprisal of a meaning given an utterance. This operationalization of listener effort is intuitively related to existing work in sentence processing in which word comprehension difficulty is proportional to surprisal [@Hale2001a; @Levy2008a].
 
 $$\text{listener effort} = -log_2(L(m|u, c; \ell))$$
 
