@@ -14,6 +14,8 @@ library(ggthemes)
 
 ```{r read-files}
 fp <- '/Users/benpeloquin/Data/zipf_principles/ambiguity/runs-20190121/uniform_uniform_1_1_500.csv'
+fp <- '/Users/benpeloquin/Desktop/Projects/zipf_principles/test-20190130/uniform_uniform_1_1_500.csv'
+fp <- '/Users/benpeloquin/Data/zipf_principles/ambiguity/runs-20190130/uniform_uniform_1_1_500.csv'
 df <- read.csv(fp)
 ```
 
@@ -46,8 +48,8 @@ p1 <- df %>%
                           ifelse(objective=='is_min_listener_entropy', 'Optimal Listener', 'Optimal Speaker'))) %>%
   rename(Objective=objective) %>%
   ggplot(aes(x=n_contexts, y=prop_ambiguous, col=Objective)) +
-    geom_line(size=1.5) +
-    geom_errorbar(aes(ymin=ci_low, ymax=ci_high), width=0.05, size=1, alpha=0.7) +
+    geom_line(size=1, alpha=0.9) +
+    geom_errorbar(aes(ymin=ci_low, ymax=ci_high), width=0.05, alpha=0.7, col='black') +
     ylab("Percent optimal languages \n containing ambiguity") +
     xlab("Number of contexts (|C|)") +
     theme_few()

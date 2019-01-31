@@ -17,6 +17,7 @@ CONTEXT_RUN_PARAMS = {
         'verbose': False
     },
     # fp pattern below
+    # ----------------
     # utterance_order_fn_name-meaning_order_fn_name-speaker_k-listener_k
     'out_file_name': 'uniform_uniform_1_1_500.csv'
 }
