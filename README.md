@@ -8,7 +8,7 @@ Languages display a diverse set of distributional regularities such as the relat
 
 ## Simulation 1: Optimal languages contain ambiguity when context is informative
 
-![Context effects](/paper/figs/fig1.png?raw=true "Ambiguity is increasling efficient as a function of amount of context.")
+![Context effects](/paper/figs/fig1.png?raw=true "Ambiguity is increasingly efficient as a function of amount of context.")
 
 
 ### Generate simulation data
@@ -30,7 +30,7 @@ To generate the plots run code in `ambiguity/simulation-runners/context-ambiguit
 
 ### Generate simulation data
 
-To generate the simulated data run code chuncks in `ambiguity/simulation-runners/discourse-ambiguity.Rmd` or the simulation data from the paper is available upon request.
+To generate the simulated data run code chunks in `ambiguity/simulation-runners/discourse-ambiguity.Rmd` or the simulation data from the paper is available upon request.
 
 ### Generate plots
 
@@ -38,7 +38,7 @@ To generate the plots run code in `ambiguity/simulation-runners/discourse-ambigu
 
 ## Supplemental materials
 
-We provide a complete deriviation of the Zipfian-inspired objective for language efficiency as well as additional modeling details in the supplemental materils `paper/supplementary_materials.pdf`.
+We provide a complete derivation of the Zipfian-inspired objective for language efficiency as well as additional modeling details in the supplemental materials `paper/supplementary_materials.pdf`.
 
 ## Repo organization:
 
@@ -50,6 +50,6 @@ We provide a complete deriviation of the Zipfian-inspired objective for language
 * `simulations.py` primary simulation infrastructure. Note that we run "context" simulations in the current work.
 * `agents.py` basic matrix manipulation as well as matrix-defined RSA agents.
 * `utils.py` general usefulities.
-* `simulation-runners` contains simulation run and plotting functionalit (detailed above).
+* `simulation-runners` contains simulation run and plotting functionality (detailed above).
 * `zipf_principles/ambiguity/webppl/...`
   * `discourse_ambiguity_model.wppl` contains Simulation 2 model code. For best viewing set interpreter to javascript.
