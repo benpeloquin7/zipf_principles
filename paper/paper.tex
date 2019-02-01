@@ -107,17 +107,16 @@ empirical targets exploring semantic typology (Regier, Kemp, \& Kay,
 2015), properties such as ambiguity (Piantadosi, Tily, \& Gibson, 2011)
 and compositionality (Kirby, Griffiths, \& Smith, 2014), and the
 efficient use of reduction and redundancy in production (Genzel \&
-Charniak, 2002; Levy \& Jaeger, 2007). These projects typically employ
-information-theoretic principles to characterize efficiency in natural
-or simulated language corpora.\par
+Charniak, 2002; Levy \& Jaeger, 2007).\par
 
-To preview, we diverge from this approach in two ways. First we derive a
-measure of efficiency from first principles of
-\textit{efficient language use} and show how this can lead to
-communicatively efficient systems. Second we demonstrate how assumptions
-about language-users impacts whether language properties are used
-efficiently. In this way, we bridge questions of design and use in a
-single framework.\par
+The approaches above typically posit efficiency measures motivated by
+information-theoretic principles, but not directly grounded in language
+use by interacting agents. In this work, we derive a measure of
+efficiency from first principles of \textit{efficient language use} and
+show how this can lead to communicatively efficient systems. We also
+demonstrate how assumptions about interlocutors impacts how language
+properties are used efficiently. In this way, we bridge questions of
+design and use in a single framework.\par
 
 Functionalist theories commonly frame language efficiency in terms of a
 fundamental effort-assymetry underlying everyday communication: what is
@@ -175,15 +174,20 @@ efficiency that depends on the interactional behavior of speaker and
 listener agents. We adopt the reference game as our primary unit of
 interaction and model language users with the Rational Speech Act (RSA)
 framework -- a computional model of language use, which is nicely
-attested by experimental data on interaction. Using these basic
-ingredients, we show that the property of interest (ambiguity) is
-prevalent in languages that optimize our measure of efficiency. Further,
-we show \textit{how} ambiguity is used efficiently during local,
-in-the-moment interactions. The contributions of this work are twofold
--- we derive a novel objective for measuring linguistic efficiency and
-also show how the reference game framework, in combination with formal
-models of communication, can be used to connect ideas about system-level
-efficiencies to in-the-moment language use.\par
+attested by experimental data on interaction. Using these ingredients,
+we show that the property of interest (ambiguity) is prevalent in
+languages that optimize our measure of efficiency (Simulation 1).
+Further, we show how ambiguity is used efficiently during local,
+in-the-moment interactions (Simulation 2). Put differently, these
+simulations examine efficiency from two angles -- in the first we vary
+languages, fixing agents, and search for efficient designs. In the
+second we vary agents, fixing language, and examine efficient use. \par
+
+The contributions of this work are twofold -- we derive a novel measure
+of linguistic efficiency and also show how the reference game framework,
+in combination with formal models of communication, can be used to
+connect ideas about system-level efficiencies to in-the-moment language
+use.\par
 
 \section{Exploring efficient language design and use in rational
 pragmatic
@@ -222,8 +226,8 @@ utterance-meaning-context triple.\par
 \subsubsection{Languages}\label{languages}
 
 A language \(\ell\) defines the set of semantic mappings between
-utterance and meanings. For example, Figure 1 contains four utterances
-\(U = \{\text{blue}, \text{green}, \text{square}, \text{circle}\} \text{ and three meanings }M = \{\text{green-square}, \text{blue-square}, \text{green-circle}\}\).
+utterances and meanings. For example, Figure 1 contains four utterances
+\(U = \{\text{"blue"}, \text{"green"}, \text{"square"}, \text{"circle"}\} \text{ and three meanings }M = \{\text{green-square}, \text{blue-square}, \text{green-circle}\}\).
 The boolean matrix describes the literal semantics of the language. We
 define a language as ``ambiguous'' if there is some utterance
 \(u \in U\) which can apply to multiple meanings (i.e.
@@ -252,7 +256,7 @@ short-hand throughout. A \emph{listener agent} defines a conditional
 distribution over meanings, mapping from utterances \(U\) to meanings
 \(M\) using \(\ell\) in a given context \(c\) (i.e. \(L(m|u, c;\ell)\)).
 Note that both speakers and listeners can induce joint distributions
-over utterace-meaning pairs, although, importantly, these distributions
+over utterance-meaning pairs, although, importantly, these distributions
 may differ: \[P_{speaker}(u, m | c; \ell) = S(u|m, c; \ell)p(m|c)\]
 \[P_{listener}(u, m| c; \ell) = L(m|u, c; \ell)p(u|c)\]
 
@@ -298,10 +302,10 @@ the world with probability \(P(C=c)\). Within this context, an object
 \(m\) occurs with probability \(p(m|c)\). The speaker attempts to refer
 to that object by sampling from her conditional distribution
 \(S(u|m, c; \ell)\) (i.e. \(e \sim p(c)p(m|c)S(u|m, c; \ell)\)). From
-the ingredients described above, it is possible to derive the following
-objective between the speaker and listener distributions (see
+these ingredients it is possible to derive the following objective
+between the speaker and listener distributions (see
 \href{https://github.com/benpeloquin7/zipf_principles/blob/master/paper/supplementary_materials.pdf}{SI 2.1}
-for a complete derivation).
+for complete derivation).
 
 \begin{equation}
 \begin{split}
@@ -338,10 +342,10 @@ context (or common ground) can provide useful information for
 disambiguation.\par
 
 As an example, say we have two objects (\(m_1\) and \(m_2\)), two
-utterances (\(u_1\) and \(u_2\)), which differ in cost, and two
-languages (\(\ell_1\) and \(\ell_2\)), which describe different
-utterance-meaning mappings. In language \(\ell_1\), the low-cost \(u_1\)
-can be used to refer to both \(m_1\) and \(m_2\)
+utterances (\(u_1\) and \(u_2\)), differing in cost, and two languages
+(\(\ell_1\), \(\ell_2\)), describing different utterance-meaning
+mappings. In language \(\ell_1\), the low-cost \(u_1\) can be used to
+refer to both \(m_1\) and \(m_2\)
 (\([[u_1]]_{\ell_1} = \{m_1, m_2 \}\)), but the high-cost \(u_2\) cannot
 be used at all (\([[u_2]]_{\ell_1} = \emptyset\)). By contrast, in
 language \(\ell_2\), \(u_1\) can only refer to \(m_1\) and \(u_2\) can
@@ -353,13 +357,13 @@ however, if context is disambiguating then the speaker can use \(u_1\)
 to refer to either \(m_1\) or \(m_2\) and \(\ell_1\) should be preferred
 to \(\ell_2\).\par
 
-In the following experiments we explore two aspects of Piantadosi's et
+In the following simulations we explore two aspects of Piantadosi's et
 al.'s claim. In Simulation 1, we examine the efficient language
 \emph{structure} aspect of their claim, exploring when the optimal
 linguistic system \(\ell^*\) is most likely to contain ambiguous
 expressions. In Simulation 2, we explore an efficient language
-\emph{use} aspect of the claim -- at what point in a conversation is it
-useful for a speaker to use ambiguous expressions?\par
+\emph{use} aspect of the claim -- under what assumptions will agents use
+ambiguity efficiently in a conversation?\par
 
 \begin{CodeChunk}
 \begin{figure*}[h]
@@ -458,7 +462,7 @@ languages always contain ambiguity. If languages are designed to
 minimize listener effort then ambiguity is always avoided.\par
 
 While our results indicate that ambiguity is an efficient property of
-contextualized language, these simulations assumed that agents had
+contextualized language use, these simulations assumed that agents had
 perfect knowledge of the relevant conditional distributions
 (\(P(M|C)\)). This assumption may be too strong for describing much of
 day-to-day communication -- we seldom interact with others with perfect
@@ -476,11 +480,10 @@ agents leads to a preference for languages that contain ambiguity. In
 Simulation 2 we assume a single fixed language \(\ell\), which contains
 ambiguity, and instead vary the types of agents using \(\ell\). We will
 show that efficient \emph{use} of ambiguity depends on an agent's
-ability to use context for disambiguation. This instantiates an on-line
-perspective on the communicative function of ambiguity theory. More
-generally, it demonstrates how we can assess both questions of efficient
-use (current simulation) as well as design (previous simulation) in the
-same framework.\par
+ability to use context for disambiguation. More generally, Simulation 2
+is intended to demonstrates how we can assess both questions of
+efficient use (current simulation) as well as design (previous
+simulation) in the same framework.\par
 
 Imagine a scenario in which a reader is beginning a news article. While
 they may have some knowledge about the article's topic (perhaps from the
@@ -554,8 +557,8 @@ avoid ambiguity entirely (\textit{Partial pragmatics} model).\par
 
 \subsection{Results and Discussion}\label{results-and-discussion-1}
 
-Figure 3, panel (A) shows the empirical probability that a speaker uses
-an ambiguous utterance as a function of discourse position. The
+Figure 3, panel (A) shows the empirical probability a speaker uses an
+ambiguous utterance as a function of discourse position. The
 \textit{No pragmatic} baseline uses ambiguous utterances frequently and
 at a constant rate over the discourse. The \textit{Partial pragmatic}
 baseline avoids ambiguous utterances entirely. But, the
@@ -569,9 +572,9 @@ quickly under the \textit{Full} and \textit{Partial} pragmatic speakers
 as listener agents are better able to infer the correct context.
 Additionally, the difference in CE between the \textit{Full}- and
 \textit{Partial pragmatic} models at the end of the discourse is driven
-by the reduction in speaker costs (see panel B). While speaker effort
-remains constant in both \textit{No pragmatic} and
-\textit{Partial pragmatic} baselines, effort declines in the
+by the reduction in speaker costs. Panel (B) tracks speaker effort,
+which remains constant in both \textit{No pragmatic} and
+\textit{Partial pragmatic} baselines. But, effort declines in the
 \textit{Full pragmatic} model as she increasingly relies on ambiguous
 material later in the discourse.\par
 
@@ -607,7 +610,7 @@ language-structure and use.\par
 
 \vspace{1em}
 
-\fbox{\parbox[b][][c]{7.3cm}{\centering {Code and SI are available at this \href{https://github.com/benpeloquin7/zipf_principles/}{repository}.}}}
+\fbox{\parbox[b][][c]{7.3cm}{\centering {Code and SI: \href{https://bit.ly/2DOnjI4}{\url{https://bit.ly/2DOnjI4}}.}}}
 \vspace{1em} \noindent
 
 \section{References}\label{references}
