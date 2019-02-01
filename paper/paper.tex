@@ -109,10 +109,15 @@ and compositionality (Kirby, Griffiths, \& Smith, 2014), and the
 efficient use of reduction and redundancy in production (Genzel \&
 Charniak, 2002; Levy \& Jaeger, 2007). These projects typically employ
 information-theoretic principles to characterize efficiency in natural
-or simulated language corpora. We adopt a different approach in this
-work, deriving a measure of efficiency from first principles of
+or simulated language corpora.\par
+
+We adopt a different approach in this work in two ways. First we derive
+a measure of efficiency from first principles of
 \textit{efficient language use} and show how this can lead to
-communicatively efficient systems.\par
+communicatively efficient systems. Second we demonstrate how assumptions
+about language-users impacts whether language properties are used
+efficiently. In this way, we bridge questions of design and use in a
+single framework.\par
 
 Functionalist theories commonly frame language efficiency in terms of a
 fundamental effort-assymetry underlying everyday communication: what is
@@ -155,10 +160,10 @@ pragmatics, speakers and listeners follow a set of conversational maxims
 in which they cooperate to transfer information (Grice, 1975). These
 maxims appear to emerge from efficiency concerns, however (Horn, 1984).
 We formalize this connection -- showing how system-level efficiencies
-can emerge from local interaction behavior of pragmatic agents.
-Intuitively, our claim is that to understand an ``efficient'' property
-of a system it is essential that we consider how that property is
-\emph{used} efficiently.\par
+can emerge from local interaction behavior of pragmatic agents. Our
+claim is that to understand an ``efficient'' property of a system it is
+essential that we consider how that property is \emph{used}
+efficiently.\par
 
 We provide a case study for this approach, in which functionalist
 regularities emerge from the dynamics of pragmatic communication. We
@@ -235,8 +240,9 @@ Goodman, 2012; Goodman \& Frank, 2016). RSA is a formalization of
 essential Gricean pragmatic principles -- agents reason about one
 another and their shared context (Grice, 1975). We adopt RSA as our
 representational framework to model Gricean (rational and pragmatic)
-speaker-listeners in the reference game setting (see SI and Goodman \&
-Frank (2016) for review).\par
+speaker-listeners in the reference game setting (see
+\href{https://github.com/benpeloquin7/zipf_principles/blob/master/paper/supplementary_materials.pdf}{SI}
+and Goodman \& Frank (2016) for a review).\par
 
 An RSA \emph{speaker agent} defines a conditional distribution over
 utterances, mapping from intended meanings \(M\) to utterances \(U\)
@@ -293,8 +299,9 @@ the world with probability \(P(C=c)\). Within this context, an object
 to that object by sampling from her conditional distribution
 \(S(u|m, c; \ell)\) (i.e. \(e \sim p(c)p(m|c)S(u|m, c; \ell)\)). From
 the ingredients described above, it is possible to derive the following
-objective between the speaker and listener joint distributions (see SI
-2.2 for a complete derivation).
+objective between the speaker and listener distributions (see
+\href{https://github.com/benpeloquin7/zipf_principles/blob/master/paper/supplementary_materials.pdf}{SI 2.1}
+for a complete derivation).
 
 \begin{equation}
 \begin{split}
@@ -309,7 +316,7 @@ communicate under one distribution, given that the ``true'' distribution
 differs. In our case, we have an expectation over this term -- the
 expected difference between the distributions assumed by the speaker
 \(P_{speaker}\) and listener \(P_{listener}\) given a set of contexts
-\(C\)\footnote{Note that in the single context case $|C|=1$ this objective is simply the speaker-listener Cross-Entropy over utterance-meaning pairs $H_{cross}[P_{speaker}(u, m; \ell), P_{listener}(u, m; \ell)]$}.
+\(C\)\footnote{Note that in the single context case $|C|=1$ this objective is simply the speaker-listener Cross-Entropy.}.
 In other words, an ``efficient'' language \(\ell\) minimizes the
 distance between what speakers and listeners think.
 
@@ -320,9 +327,7 @@ The task of understanding language is marked by a frequent need to
 handle various forms of ambiguity: lexical, syntactic, among others
 (Wasow, Perfors, \& Beaver, 2005). The ubiquity of this property,
 however, has been argued to provide evidence that languages have not
-been optimized for
-communication\footnote{Chomsky's (2002) claim that "... language is not well designed, because you have such properties as ambiguity" is analogous to the Zipfian optimal Listener language $\ell_{listener}^*$.}
-(Chomsky, 2002).
+been optimized for communication (Chomsky, 2002).
 
 Piantadosi et al. (2011) argue just the opposite, claiming that
 ambiguity is an \emph{efficient} property of any communication system in
@@ -351,10 +356,10 @@ to \(\ell_2\).\par
 In the following experiments we explore two aspects of Piantadosi's et
 al.'s claim. In Simulation 1, we examine the efficient language
 \emph{structure} aspect of their claim, exploring when the optimal
-linguistic system \(\ell^*\) is most likely to contain ambiguous lexical
-items. In Simulation 2, we explore an efficient language \emph{use}
-aspect of the claim -- at what point in a conversation is it useful for
-a speaker to use ambiguous lexical material?\par
+linguistic system \(\ell^*\) is most likely to contain ambiguous
+expressions. In Simulation 2, we explore an efficient language
+\emph{use} aspect of the claim -- at what point in a conversation is it
+useful for a speaker to use ambiguous expressions?\par
 
 \begin{CodeChunk}
 \begin{figure*}[h]
@@ -363,7 +368,7 @@ a speaker to use ambiguous lexical material?\par
 
 }
 
-\caption[Panel (A) Vertical axis shows the proportion of optimal languages containing ambiguity]{Panel (A) Vertical axis shows the proportion of optimal languages containing ambiguity. Horizontal axis shows the number of context-sizes (1-4). Optimal language under CE objective (red). Speaker-optimal (blue). Listener-optimal (green). Error bars represent 95 percent confidence intervals. Panel (B), example CE-optimal language (ambiguous) under in a four-condition context. Panel (C), example CE-optimal language in a single-condition context.}\label{fig:plot-optimal-langs}
+\caption[Panel (A) Vertical axis shows the proportion of optimal languages containing ambiguity]{Panel (A) Vertical axis shows the proportion of optimal languages containing ambiguity. Horizontal axis shows the number of context-sizes (1-4). Optimal language under CE objective (red). Speaker-optimal (blue). Listener-optimal (green). Error bars represent 95 percent confidence intervals. Panel (B), example CE-optimal language (ambiguous) under in a four-condition context. Panel (C), example CE-optimal language (unambiguous) in a single-condition context.}\label{fig:plot-optimal-langs}
 \end{figure*}
 \end{CodeChunk}
 
@@ -376,8 +381,8 @@ in the reference game setting. We proceed by generating languages with
 different amounts of contextual support (varying the size of \(|C|\)).
 We search the space of languages, examining whether ones which minimize
 our objective contain ambiguity. If context leads to more efficient
-communication, then optimal languages under our objective should be more
-likely to be ambiguous as the amount of context increases.\par
+communication, then optimal languages should be more likely to be
+ambiguous as the amount of context increases.\par
 
 \subsection{Simulation set-up}\label{simulation-set-up}
 
@@ -392,17 +397,6 @@ assignment). For a given simulation, the goal is to find the language
 \(\ell^*\) which minimizes our objective and then check to see if that
 language contains ambiguity.\par
 
-\begin{CodeChunk}
-\begin{figure*}[h]
-
-{\centering \includegraphics{figs/plot-optimal-use-1} 
-
-}
-
-\caption[(A) shows the empirical probability that our speaker used an ambiguous utterance as a function of discourse position]{(A) shows the empirical probability that our speaker used an ambiguous utterance as a function of discourse position. (B) shows speaker effort across the three models. (C) shows the Cross-Entropy objective under our three speaker models. Error bars represent 95 percent confidence intervals.}\label{fig:plot-optimal-use}
-\end{figure*}
-\end{CodeChunk}
-
 We define language efficiency as a function of the particular semantic
 mappings induced by that language, the speaker and listener agents
 (\(S\) and \(L\)), as well as the utterance (\(P(U)\)), meaning
@@ -413,6 +407,17 @@ structure, for each simulation we generate
 \(c\)), and \(P(C) \sim \text{Dir}(1, |C|)\), where \(\text{Dir}(1, k)\)
 specifies the uniform Dirichlet distribution over a \(k\)-dimensional
 probability vector.\par
+
+\begin{CodeChunk}
+\begin{figure*}[h]
+
+{\centering \includegraphics{figs/plot-optimal-use-1} 
+
+}
+
+\caption[(A) shows the empirical probability that our speaker used an ambiguous utterance as a function of discourse position]{(A) shows the empirical probability that our speaker used an ambiguous utterance as a function of discourse position. (B) shows speaker effort across the three models. (C) shows the Cross-Entropy objective under our three speaker models. Error bars represent 95 percent confidence intervals.}\label{fig:plot-optimal-use}
+\end{figure*}
+\end{CodeChunk}
 
 \subsubsection{Context}\label{context}
 
@@ -433,23 +438,24 @@ two additional objectives. Zipf (1949) proposed that the speaker-optimal
 language \(\ell_{speaker}^*\) would minimize speaker effort and the
 listener-optimal language \(\ell_{listener}^*\) would minimize listener
 effort. We define these objectives using the first and second half of
-equation 1 (see SI section 2.2. for more detail).\par
+equation 1 (see
+\href{https://github.com/benpeloquin7/zipf_principles/blob/master/paper/supplementary_materials.pdf}{SI 2.2.}).\par
 
 \subsection{Results and Discussion}\label{results-and-discussion}
 
 In Simulation 1 we explored the degree to which ambiguity is an
 efficient property of languages when communication is contextualized.
-Figure 1 plots the proportion of optimal languages under each objective
-as a function of number of contexts. The red line shows that as the
-number of contexts increases, so does the probability that an optimal
-language \(\ell^*_{cross}\) contains ambiguity (at least one utterance
-maps to two meanings) under our CE objective. For comparison we also
-plot the proportion of speaker-optimal \(\ell^*_{speaker}\) (blue line)
-and listener-optimal \(\ell^*_{listener}\) (green line) languages that
-contain ambiguity. In line with Zipf's predictions, if languages are
-designed only to minimize speaker effort then optimal languages always
-contain ambiguity. If languages are designed to minimize listener effort
-then ambiguity is always avoided.\par
+Figure 2, panel (A) plots the proportion of optimal languages under each
+objective as a function of number of contexts. The red line shows that
+as the number of contexts increases, so does the probability that an
+optimal language \(\ell^*_{cross}\) contains ambiguity (at least one
+utterance maps to two meanings) under our CE objective. For comparison
+we also plot the proportion of speaker-optimal \(\ell^*_{speaker}\)
+(blue line) and listener-optimal \(\ell^*_{listener}\) (green line)
+languages that contain ambiguity. In line with Zipf's predictions, if
+languages are designed only to minimize speaker effort then optimal
+languages always contain ambiguity. If languages are designed to
+minimize listener effort then ambiguity is always avoided.\par
 
 While our results indicate that ambiguity is an efficient property of
 contextualized language, these simulations assumed that agents had
@@ -490,22 +496,22 @@ analogous to a ``topic'' of conversation. \par
 
 \subsection{Simulation set-up}\label{simulation-set-up-1}
 
-We consider consider a single language \(\ell\), which contains both
-ambiguous and unambiguous utterances. We assume ambiguous utterances are
-lower cost. Crucially, we do not assume that the listener knows the
-particular topic (\(c_{current}\)) of the conversation
-\textit{a priori}. Rather, that the listener has knowledge of the set of
-possible topics \(C = \{c_1, \dots, c_k\}\), but does not know which one
-is currently being used by the speaker. Formally, this means the
-listener does not have access to the correct conditional distribution
-over meanings \(P(M|C=c_{current})\) at the start of the discourse.\par 
+We consider a single language \(\ell\), which contains both ambiguous
+and unambiguous utterances. We assume ambiguous utterances are lower
+cost. Crucially, we do not assume that the listener knows the particular
+topic (\(c_{current}\)) of the conversation \textit{a priori}. Rather,
+that the listener has knowledge of the set of possible topics
+\(C = \{c_1, \dots, c_k\}\), but does not know which one is currently
+being used by the speaker. Formally, this means the listener does not
+have access to the correct conditional distribution over meanings
+\(P(M|C=c_{current})\) at the start of the discourse.\par 
 
 Over the course of a discourse \(D\), the listener tries to infer both
 the current topic, \(c_{current}\), as well as the particular meaning
-\(m\) of a given utterance \(u\). That is, we consider listener and
-speaker agents who can track the history of previous utterances \(D\).
-Importantly, an agent can attempt to infer the current topic of
-conversation \(c_{current}\) using the discourse history \(D\).\par
+\(m\) of a given utterance \(u\). That is, we consider agents who can
+track the history of previous utterances \(D\). Importantly, an agent
+can attempt to infer the current topic of conversation \(c_{current}\)
+using the discourse history \(D\).\par
 
 We conduct \(N=600\) simulations, generating discourses of length
 \(|D|=30\) utterances, comparing three speaker models (\(n=200\) each).
@@ -528,10 +534,11 @@ speaker believes that the listener may not know the current topic
 discourse. We compare two baseline models. The first, a
 \textit{Partial pragmatics} baseline describes a speaker who reasons
 about a listener, but assumes they have no access to the discourse
-history. The second, a \textit{No pragmatics} speaker does not consider
-a listener at all, but produces utterances according to the underlying
-langauge semantics (\(\ell\)) and topic probabilities
-(\(p(M|C=c_{current}\)) (see SI section 3).\par
+history. The second, a \textit{No pragmatics} baseline speaker does not
+consider a listener at all, but produces utterances according to the
+underlying langauge semantics (\(\ell\)) and topic probabilities
+(\(p(M|C=c_{current}\)) (see
+\href{https://github.com/benpeloquin7/zipf_principles/blob/master/paper/supplementary_materials.pdf}{SI 3}).\par
 
 \subsection{Hypotheses}\label{hypotheses}
 
@@ -550,7 +557,7 @@ avoid ambiguity entirely (\textit{Partial pragmatics} model).\par
 Figure 2 (A) shows the empirical probability that a speaker uses an
 ambiguous utterance as a function of discourse position. The
 \textit{No pragmatic} baseline uses ambiguous utterances frequently and
-at a constant rate over the discourse and the \textit{Partial pragmatic}
+at a constant rate over the discourse. The \textit{Partial pragmatic}
 baseline avoids ambiguous utterances entirely. But, the
 \textit{Full pragmatic} model avoids ambiguous material only at the
 start of the discourse, employing it increasingly as the discourse
@@ -579,23 +586,29 @@ understanding efficient language structure and use. We focused on an
 argument on the communicative function of ambiguity (Piantadosi et al.,
 2011), deriving a novel speaker-listener Cross-Entropy objective for
 measuring the efficiency of linguistic systems from first principles of
-efficient language use. In a series of simulations we showed that
-optimal languages are more likely to contain ambiguous material when
-context is informative and that rational pragmatic agents will use
-ambiguous material efficiently.\par
+efficient language use. In Simulation 1 we showed that optimal languages
+are more likely to contain ambiguous material when context is
+informative. In Simulation 2 we showed how rational pragmatic agents use
+ambiguous material efficiently in conversation.\par
 
-A limitation of the current work is an analysis of exactly how this
+A limitation of the current work is an analysis of exactly how the CE
 objective compares to existing measures. For example, previous work has
 described competing speaker-listener pressures in terms of a trade-off
 of simplicity and informativeness (Kemp \& Regier, 2012) or expressivity
-and compressibility (Smith, Tamariz, \& Kirby, 2013). Future work should
-assess the degree to which we can derive the same properties as previous
-studies using our current framework. In line with this idea, a primary
-focus of the current work is to provide a case-study on the productivity
-of assessing functionalist theories in repeated reference games between
-rational pragmatic agents. We hope this framework can serve as a domain
-general tool to assess the range of functionalist theories examining
-efficient language-structure and use.\par
+and compressibility (Smith, Tamariz, \& Kirby, 2013) to explain
+linguistic regularities. Future work should assess the degree to which
+we can derive the same properties as previous studies using our current
+framework. In line with this idea, a primary focus of the current work
+is to provide a case-study on the productivity of assessing
+functionalist theories in repeated reference games between rational
+pragmatic agents. We hope this framework can serve as a domain general
+tool to assess the range of functionalist theories examining efficient
+language-structure and use.\par
+
+\vspace{1em}
+
+\fbox{\parbox[b][][c]{7.3cm}{\centering {Code and SI are available at this \href{https://github.com/benpeloquin7/zipf_principles/}{link}.}}}
+\vspace{1em} \noindent
 
 \section{References}\label{references}
 
