@@ -272,9 +272,9 @@ utterance in a particular
 context\footnote{In the current set of simulations we consider utterances costs as independent from context (ie. $p(u|c)p(c)=p(u)p(c)$).}
 -- intuitively, the number of bits needed to encode the utterance \(u\).
 This particular formalization of speaker-cost is general enough to
-accommodate a range of cost instantiations, such as production difficult
-via articulation effort, cognitive effort related to lexical access, or
-others (Bennett \& Goodman, 2018).\par
+accommodate a range of cost instantiations, such as production
+difficulty via articulation effort, cognitive effort related to lexical
+access, or others (Bennett \& Goodman, 2018).\par
 
 \[\text{speaker effort} = -log_2(p(u|c))\]
 
@@ -382,15 +382,15 @@ likely to be ambiguous as the amount of context increases.\par
 \subsection{Simulation set-up}\label{simulation-set-up}
 
 We conduct \(N=2000\) simulations. For each simulation we enumerate the
-set of \emph{valid} languages in which \(|U|=|M|=4\) (recall that \(U\)
-is our set of utterances and \(M\) our set of meanings). Note that a
-language \(\ell \in L\) is ``valid'' so long as each possible meaning in
-\(m \in M\) can be referred to by at least one form \(u \in U\) (every
-column of \(\ell\) has some non-zero assignment) and each form maps to
-at least one meaning (every column has some non-zero assignment). For a
-given simulation, the goal is to find the language \(\ell^*\) which
-minimizes our objective and then check to see if that language contains
-ambiguity.\par
+set of \emph{valid} languages in which \(|U|=|M|=4\) (\(U\) is our set
+of utterances and \(M\) our set of meanings). Recall that languages are
+boolean matrices and a language \(\ell \in L\) is ``valid'' so long as
+each possible meaning in \(m \in M\) can be referred to by at least one
+form \(u \in U\) (every column of \(\ell\) has some non-zero assignment)
+and each form maps to at least one meaning (every row has some non-zero
+assignment). For a given simulation, the goal is to find the language
+\(\ell^*\) which minimizes our objective and then check to see if that
+language contains ambiguity.\par
 
 \begin{CodeChunk}
 \begin{figure*}[h]
@@ -440,48 +440,53 @@ equation 1 (see SI section 2.2. for more detail).\par
 In Simulation 1 we explored the degree to which ambiguity is an
 efficient property of languages when communication is contextualized.
 Figure 1 plots the proportion of optimal languages under each objective
-as a function of context size. The red line shows that as the number of
-contexts increases, so does the probability that an optimal language
-\(\ell^*_{cross}\) contains ambiguity under our CE objective. For
-comparison we also plot the proportion of speaker-optimal
-\(\ell^*_{speaker}\) (blue line) and listener-optimal
-\(\ell^*_{listener}\) (green line) languages that contain ambiguity. In
-line with Zipf's predictions, if languages are designed only to minimize
-speaker effort then optimal languages always contain ambiguity. If
-languages are designed to minimize listener effort then ambiguity is
-always avoided.\par
+as a function of number of contexts. The red line shows that as the
+number of contexts increases, so does the probability that an optimal
+language \(\ell^*_{cross}\) contains ambiguity (at least one utterance
+maps to two meanings) under our CE objective. For comparison we also
+plot the proportion of speaker-optimal \(\ell^*_{speaker}\) (blue line)
+and listener-optimal \(\ell^*_{listener}\) (green line) languages that
+contain ambiguity. In line with Zipf's predictions, if languages are
+designed only to minimize speaker effort then optimal languages always
+contain ambiguity. If languages are designed to minimize listener effort
+then ambiguity is always avoided.\par
 
 While our results indicate that ambiguity is an efficient property of
-contextualized language, these simulations assumed that agents could
-always disambiguate items in context. That is, in our four conditions
-both agents had perfect knowledge of the relevant conditional
-distributions (\(P(M|C)\)). This assumption may be too strong for
-describing much of day-to-day communication -- we seldom interact with
-others with perfect knowledge of the current context (or topic) at the
-start of a conversation. To explore how ambiguity may be \textit{used}
-efficiently in our framework, we next examine a case in which the
-listener has imperfect knowledge of context at the start of the
-conversation, but may infer it from the discourse history.\par
+contextualized language, these simulations assumed that agents had
+perfect knowledge of the relevant conditional distributions
+(\(P(M|C)\)). This assumption may be too strong for describing much of
+day-to-day communication -- we seldom interact with others with perfect
+knowledge of the current context (or topic) at the start of a
+conversation. To explore how ambiguity may be \textit{used} efficiently
+in our framework, we next examine a case in which the listener has
+imperfect knowledge of context at the start of the conversation, but may
+infer it from the discourse history.\par
 
 \section{Simulation 2: Rational, pragmatic speakers use ambiguity
 efficiently}\label{simulation-2-rational-pragmatic-speakers-use-ambiguity-efficiently}
 
-We shift focus in Simulation 2 -- instead of examining the landscape of
-a space of languages under our CE objective, we consider a single
-language containing ambiguity, examining how that property is used over
-a discourse. If context is not informative with respect to meaning early
-in a discourse, but is at later positions, then an efficient speaking
-strategy would avoid ambiguous material early, saving it for when
-contextual information is disambiguating. We can consider ``context'' as
-analogous to a ``topic'' of conversation. As an example, imagine a
-scenario in which a reader is beginning a magazine article. While they
-may have some knowledge about the article's topic (perhaps from the
+In Simulation 1 we showed that efficiency defined in terms of pragmatic
+agents leads to a preference for languages that contain ambiguity. In
+Simulation 2 we assume a single fixed language \(\ell\), which contains
+ambiguity, and instead vary the types of agents using \(\ell\). We will
+show that efficient \emph{use} of ambiguity depends on an agent's
+ability to use context for disambiguation. This instantiates an on-line
+perspective on the communicative function of ambiguity theory. More
+generally, it demonstrates how the reference game framework can be used
+to asses questions of efficient language use (current simulation) as
+well as language design (Simulation 1).\par
+
+Imagine a scenario in which a reader is beginning a news article. While
+they may have some knowledge about the article's topic (perhaps from the
 title), they may not have complete knowledge of its contents, including
 the persons or events involved. In this setting, using a low-cost, but
 ambiguous referring expression (say a pronoun like ``he'') early may
 lead to misunderstanding if context is not informative. But, if by a
 later position enough contextual information has accumulated, it may be
-efficient to use the ambiguous expression.\par
+efficient to use the ambiguous expression. We pursue this general
+framework in Simulation 2 -- examining when in a discourse using
+ambigity is efficient. Note that we will consider ``context'' as
+analogous to a ``topic'' of conversation. \par
 
 \subsection{Simulation set-up}\label{simulation-set-up-1}
 
@@ -497,11 +502,10 @@ over meanings \(P(M|C=c_{current})\) at the start of the discourse.\par
 
 Over the course of a discourse \(D\), the listener tries to infer both
 the current topic, \(c_{current}\), as well as the particular meaning
-\(m\) of a given utterance \(u\). That is, we consider updated listener
-and speakers (\(L(m, c|u,D;\ell)\), \(S(u|m,c,D;\ell)\)) in which both
-agents can track the history of previous utterances \(D\). Importantly,
-an agent can attempt to infer the current topic of conversation
-\(c_{current}\) using the discourse history \(D\).\par
+\(m\) of a given utterance \(u\). That is, we consider listener and
+speaker agents who can track the history of previous utterances \(D\).
+Importantly, an agent can attempt to infer the current topic of
+conversation \(c_{current}\) using the discourse history \(D\).\par
 
 We conduct \(N=600\) simulations, generating discourses of length
 \(|D|=30\) utterances, comparing three speaker models (\(n=200\) each).
@@ -515,28 +519,29 @@ space is computationally expensive.)\par
 
 \subsection{Speaker agents}\label{speaker-agents}
 
+We vary the degree to which agents can use context for disambiguation.
 We consider three types of speaker models. Our \textit{Full pragmatics}
 agent, models a speaker who reasons about her listener and also has
 complete recall of the set of utterances in the discourse \(D\). This
 speaker believes that the listener may not know the current topic
-\(c_{current}\) at the start of the discrouse, but can infer it over the
+\(c_{current}\) at the start of the discourse, but can infer it over the
 discourse. We compare two baseline models. The first, a
 \textit{Partial pragmatics} baseline describes a speaker who reasons
-about a listener, but assumes they have no access to discourse history.
-The second, a \textit{No pragmatics} speaker who does not consider a
-listener at all, but produces utterances according to the underlying
+about a listener, but assumes they have no access to the discourse
+history. The second, a \textit{No pragmatics} speaker does not consider
+a listener at all, but produces utterances according to the underlying
 langauge semantics (\(\ell\)) and topic probabilities
 (\(p(M|C=c_{current}\)) (see SI section 3).\par
 
 \subsection{Hypotheses}\label{hypotheses}
 
-We are interested in when it is efficient to use low-cost, ambiguous
-material in this discourse setting. A speaker strategy that is mutually
-efficient for both agents should avoid ambiguity until sufficient
-contextual information has accumulated. We should expect this to be
-reflected in our \textit{Full pragmatics} model who reasons about the
-listener and discourse history. By contrast, a speaker-optimal model who
-does not consider the listener should greedily use ambiguous utterances
+We are interested in how each speaker-model uses ambiguity over the
+discourse. A speaker strategy that is mutually efficient for both agents
+should avoid ambiguity until sufficient contextual information has
+accumulated. We should expect this to be reflected in our
+\textit{Full pragmatics} model who reasons about the listener and
+discourse history. By contrast, a speaker-optimal model who does not
+consider the listener should greedily use ambiguous utterances
 (\textit{No Pragmatics} model), while a listener-optimal model should
 avoid ambiguity entirely (\textit{Partial pragmatics} model).\par
 
@@ -562,15 +567,6 @@ remains constant in both \textit{No pragmatic} and
 \textit{Partial pragmatic} baselines, effort declines in the
 \textit{Full pragmatic} model as she increasingly relies on ambiguous
 material later in the discourse.\par
-
-In Simulation 2 we explored how ambiguity could be employed efficiently
-during language use. We assumed that the listener did not know the
-current context (topic) \textit{a priori}, but could infer it from the
-discourse history. We examined speaker production behavior, tracking use
-of low-cost, but ambiguous material over the discourse. Early in the
-discourse the \textit{Full pragmatic} speaker avoided using ambiguous
-material, only using the material later when the current topic was known
-to the listener.
 
 \section{General Discussion}\label{general-discussion}
 
@@ -629,7 +625,7 @@ Genzel, D., \& Charniak, E. (2002). Entropy rate constancy in text. In
 computational linguistics}.
 
 \hypertarget{ref-GoodmanFrank2016a}{}
-Goodman, N., \& Frank, M. (2016). Pragmatic language interpreation as
+Goodman, N., \& Frank, M. (2016). Pragmatic language interpretation as
 probabilistic inference. \emph{Trends in Cognitive Sciences},
 \emph{20(11)}, 818--829.
 

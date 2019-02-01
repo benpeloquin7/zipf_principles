@@ -52,10 +52,11 @@ p1 <- df %>%
     geom_errorbar(aes(ymin=ci_low, ymax=ci_high), width=0.05, alpha=0.7, col='black') +
     ylab("Percent optimal languages \n containing ambiguity") +
     xlab("Number of contexts (|C|)") +
-    theme_few()
+    theme_few() +
     # In case we want to embed legend in the plot, but not really necessary...
-    # theme(legend.position = c(0.8, 0.4),
-    #       legend.background = element_rect(colour = 'grey', fill = 'white', linetype='solid'))
+    theme(legend.position = c(0.7, 0.3),
+          legend.background = element_rect(colour = 'grey', fill = 'white', linetype='solid'),
+          plot.margin = unit(c(0, 0, 0, 0), "cm"))
 ```
 
 ```{r plot1-b}
@@ -77,6 +78,21 @@ p2 <- df %>%
     xlab("Number of contexts (|C|)")
 ```
 
+Saves plot grid with example unambiguous and ambiguous language.
+```{r}
+p2 <- ggdraw() +
+  draw_image("../../paper/figs/ambiguous_lang.png", scale=0.75)
+p3 <- ggdraw() +
+  draw_image("../../paper/figs/unambiguous_lang.png", scale=0.75, clip="on")
+
+g1 <- plot_grid(p2, p3, align='vh', ncol=1, labels=c("B", "C")) +
+  theme(plot.margin = unit(c(0, 0, 0, 0.4), "cm"))
+g2 <- plot_grid(p1, g1, ncol=2, labels=c("A", "", ""))
+
+ggsave(file.path(getwd(), "../../paper/figs/fig1.png"), plot=g2, width=7, height=3)
+```
+
+
 Saves single fig plot.
 ```{r saving}
 # plot_grid(p1, p2, labels = c("A", "B"), align = "h")
@@ -89,4 +105,14 @@ Save grid plot
 # plot_grid(p1, p2, labels = c("A", "B"), align = "h")
 # ggsave(file.path(getwd(), "../../paper/figs/fig1.png"), width=10, height=3)
 ```
+```{r}
+df %>%
+  filter(sim_id==1, n_contexts==1) %>%
+  select(idxs, is_min_ce, is_min_listener_entropy, is_min_speaker_entropy) %>%
+  gather(typ, val, c(is_min_ce, is_min_listener_entropy, is_min_speaker_entropy)) %>%
+  filter(val=='True')
+  
+  
+```
+
 
