@@ -48,8 +48,9 @@ p1 <- df %>%
                           ifelse(objective=='is_min_listener_entropy', 'Optimal Listener', 'Optimal Speaker'))) %>%
   rename(Objective=objective) %>%
   ggplot(aes(x=n_contexts, y=prop_ambiguous, col=Objective)) +
-    geom_line(size=1, alpha=0.9) +
-    geom_errorbar(aes(ymin=ci_low, ymax=ci_high), width=0.05, alpha=0.7, col='black') +
+    geom_line() +
+    geom_errorbar(aes(ymin=ci_low, ymax=ci_high), alpha=0.5, width=0.1, col='black') +
+    geom_point(size=1.5, alpha=0.8) +
     ylab("Percent optimal languages \n containing ambiguity") +
     xlab("Number of contexts (|C|)") +
     theme_few() +
