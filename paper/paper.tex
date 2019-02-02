@@ -112,7 +112,7 @@ Levy \& Jaeger, 2007).\par
 The approaches above typically posit efficiency measures that are
 motivated by information-theoretic principles, but they typically do not
 ground out in language use by interacting agents. In this work, we
-derive an novel objective function from first principles of
+derive a novel objective function from first principles of
 \textit{rational language use} and show how optimizing this objective
 can lead to communicatively efficient systems. We also demonstrate that
 assumptions about interlocutors impact whether language properties are
@@ -245,7 +245,7 @@ Goodman, 2012; Goodman \& Frank, 2016). RSA is a formalization of
 essential Gricean pragmatic principles -- agents reason about one
 another and their shared context (Grice, 1975). We adopt RSA as our
 representational framework to model Gricean (rational and pragmatic)
-speaker-listeners in the reference game setting (see
+speakers and listeners in the reference game setting (see
 \href{https://bit.ly/2RBSGcU}{SI}).\par
 
 An RSA \emph{speaker agent} defines a conditional distribution over
@@ -333,16 +333,15 @@ however, has been argued to provide evidence that languages have not
 been optimized for communication (Chomsky, 2002).
 
 Piantadosi et al. (2011) argue just the opposite, claiming that
-ambiguity is an \emph{efficient} property of any communication system in
-which \emph{communication is contextualized}. Simply put, it is useful
-to have a language that re-uses low-cost material (has ambiguity) so
-long as the cost of disambiguating the material is low. In particular,
-context (or common ground) can provide useful information for
-disambiguation.\par
+ambiguity is an efficient property of any communication system in which
+\emph{communication is contextualized}. Simply put, it is useful to have
+a language that re-uses low-cost material (has ambiguity) so long as the
+cost of disambiguating the material is low. In particular, context (or
+common ground) can provide useful information for disambiguation.\par
 
 As an example, say we have two objects (\(m_1\) and \(m_2\)), two
 utterances (\(u_1\) and \(u_2\)), differing in cost, and two languages
-(\(\ell_1\), \(\ell_2\)), describing different utterance-meaning
+(\(\ell_1\) and \(\ell_2\)), describing different utterance-meaning
 mappings. In language \(\ell_1\), the low-cost \(u_1\) can be used to
 refer to both \(m_1\) and \(m_2\)
 (\([[u_1]]_{\ell_1} = \{m_1, m_2 \}\)), but the high-cost \(u_2\) cannot
@@ -393,7 +392,7 @@ We conduct \(N=2000\) simulations. For each simulation we enumerate the
 set of \emph{valid} languages in which \(|U|=|M|=4\) (\(U\) is our set
 of utterances and \(M\) our set of meanings). Recall that languages are
 boolean matrices and a language \(\ell \in L\) is ``valid'' so long as
-each possible meaning in \(m \in M\) can be referred to by at least one
+each possible meaning \(m \in M\) can be referred to by at least one
 form \(u \in U\) (every column of \(\ell\) has some non-zero assignment)
 and each form maps to at least one meaning (every row has some non-zero
 assignment). For a given simulation, the goal is to find the language
@@ -549,31 +548,31 @@ accumulated. We should expect this to be reflected in our
 \textit{Full pragmatics} model who reasons about the listener and
 discourse history. By contrast, a speaker-optimal model who does not
 consider the listener should greedily use ambiguous utterances
-(\textit{No Pragmatics} model), while a listener-optimal model should
+(\textit{No pragmatics} model), while a listener-optimal model should
 avoid ambiguity entirely (\textit{Partial pragmatics} model).\par
 
 \subsection{Results and Discussion}\label{results-and-discussion-1}
 
 Figure 3, panel (A) shows the empirical probability a speaker uses an
 ambiguous utterance as a function of discourse position. The
-\textit{No pragmatic} baseline uses ambiguous utterances frequently and
-at a constant rate over the discourse. The \textit{Partial pragmatic}
+\textit{No pragmatics} baseline uses ambiguous utterances frequently and
+at a constant rate over the discourse. The \textit{Partial pragmatics}
 baseline avoids ambiguous utterances entirely. But, the
-\textit{Full pragmatic} model avoids ambiguous material only at the
+\textit{Full pragmatics} model avoids ambiguous material only at the
 start of the discourse, employing it increasingly as the discourse
 proceeds. Panel (C) tracks our CE objective for each model over the
 discourse. Note that the objective decreases for all three models,
 primarily driven by the listeners updating their beliefs about the
 actual topic (\(P(C=c_{current}|D)\)). However, the objective declines
-more quickly under the \textit{Full} and \textit{Partial pragmatic}
+more quickly under the \textit{Full} and \textit{Partial pragmatics}
 speakers as listener agents are better able to infer the correct
 context. Additionally, the difference in CE between the \textit{Full}-
-and \textit{Partial pragmatic} models at the end of the discourse is
+and \textit{Partial pragmatics} models at the end of the discourse is
 driven by the reduction in speaker costs. Panel (B) tracks speaker
-effort, which remains constant in both \textit{No pragmatic} and
-\textit{Partial pragmatic} baselines. But, effort declines in the
-\textit{Full pragmatic} model as speakers increasingly rely on ambiguous
-material later in the discourse.\par
+effort, which remains constant in both \textit{No pragmatics} and
+\textit{Partial pragmatics} baselines. But, effort declines in the
+\textit{Full pragmatics} model as speakers increasingly rely on
+ambiguous material later in the discourse.\par
 
 \section{General Discussion}\label{general-discussion}
 
