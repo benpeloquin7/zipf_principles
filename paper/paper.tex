@@ -99,30 +99,31 @@ speaker-listener effort minimization. \par
 
 Zipf articulated what is now considered a \emph{functionalist} approach
 to language science -- analyzing language structure and use in terms of
-efficiency. Such an approach might reframe our opening question as
+efficiency. Such an approach might re-frame our opening question as
 follows: how does having property \textit{x} make using language
-\(\ell\) more or less useful for communication? Among others, this
-efficiency-based framing has produced a rich set of theoretical and
-empirical targets exploring semantic typology (Regier, Kemp, \& Kay,
-2015), properties such as ambiguity (Piantadosi, Tily, \& Gibson, 2011)
-and compositionality (Kirby, Griffiths, \& Smith, 2014), and the
-efficient use of reduction and redundancy in production (Genzel \&
-Charniak, 2002; Levy \& Jaeger, 2007).\par
+\(\ell\) more or less useful for communication? This efficiency-based
+framing has produced a rich set of theoretical and empirical targets
+exploring semantic typology (Regier, Kemp, \& Kay, 2015), properties
+such as ambiguity (Piantadosi, Tily, \& Gibson, 2011) and
+compositionality (Kirby, Griffiths, \& Smith, 2014), and the efficient
+use of reduction and redundancy in production (Genzel \& Charniak, 2002;
+Levy \& Jaeger, 2007).\par
 
-The approaches above typically posit efficiency measures motivated by
-information-theoretic principles, but not directly grounded in language
-use by interacting agents. In this work, we derive a measure of
-efficiency from first principles of \textit{efficient language use} and
-show how this can lead to communicatively efficient systems. We also
-demonstrate that assumptions about interlocutors impact how language
-properties are used efficiently. In this way, we bridge questions of
-design and use in a single framework.\par
+The approaches above typically posit efficiency measures that are
+motivated by information-theoretic principles, but they typically do not
+ground out in language use by interacting agents. In this work, we
+derive an novel objective function from first principles of
+\textit{rational language use} and show how optimizing this objective
+can lead to communicatively efficient systems. We also demonstrate that
+assumptions about interlocutors impact whether language properties are
+used efficiently. In this way, we integrate questions of language design
+and language use in a single framework.\par
 
 Functionalist theories commonly frame language efficiency in terms of a
-fundamental effort-assymetry underlying everyday communication: what is
+fundamental effort-asymmetry underlying everyday communication: what is
 ``hard'' for a speaker is likely different than what is ``hard'' for a
-listener. Zipf described this as follows -- purely from the standpoint
-of speaker effort, an optimal language \(\ell_{speaker}^*\) would tend
+listener. Zipf described this as follows: purely from the standpoint of
+speaker effort, an optimal language \(\ell_{speaker}^*\) would tend
 toward a vocabulary of a single, low-cost word. Given such a language,
 the full set of potential meanings would be conveyed using only that
 word, i.e. \(\ell_{speaker}^*\) would be fully ambiguous and all
@@ -134,8 +135,8 @@ need to disambiguate. In this example, speaker effort is related to
 disambiguation cost}. Clearly, natural languages fall between the two
 extremes of \(\ell_{speaker}^*\) and \(\ell_{listener}^*\). Zipf
 proposed that the particular lexicon-level properties he observed were a
-result of these competing forces -- the pressure to jointly minimize
-speaker and listener effort.\par
+result of optimization based on these competing forces -- the pressure
+to jointly minimize speaker and listener effort.\par
 
 But how does this optimization take place? The example given by Zipf
 (1949) describes local, communicative interactions in terms of a
@@ -152,8 +153,8 @@ efficient language structure and use.\par
 
 Adopting reference games as a basic unit of analysis suggests that
 optimization may take place at the level of conversation. Importantly,
-Zipf's conception of speaker and listener effort may be connected to how
-language is used; in particular, whether interlocutors engage in
+Zipf's conception of speaker and listener effort should be connected to
+how language is used; in particular, whether interlocutors engage in
 pragmatic reasoning during conversation. Under a Gricean treatment of
 pragmatics, speakers and listeners follow a set of conversational maxims
 in which they cooperate to transfer information (Grice, 1975). These
@@ -167,21 +168,21 @@ efficiently.\par
 We provide a case study for this approach, in which functionalist
 regularities emerge from the dynamics of pragmatic communication. We
 choose a property of languages that could, in principle, vary freely,
-but shows strong regularities across languages. The explanadum is why
+but shows strong regularities across languages. The explanandum is why
 this regularity holds. We examine ambiguity as our property, extending
 ideas by Piantadosi et al. (2011). We define a novel measure of
 efficiency that depends on the interactional behavior of speaker and
 listener agents. We adopt the reference game as our primary unit of
 interaction and model language users with the Rational Speech Act (RSA)
-framework -- a computional model of language use, which is nicely
-attested by experimental data on interaction. Using these ingredients,
-we show that the property of interest (ambiguity) is prevalent in
-languages that optimize our measure of efficiency (Simulation 1).
-Further, we show how ambiguity is used efficiently during local,
-in-the-moment interactions (Simulation 2). Put differently, these
-simulations examine efficiency from two angles -- in the first we vary
-languages, fixing agents, and search for efficient designs. In the
-second we vary agents, fixing language, and examine efficient use. \par
+framework -- a computational model of language use, which is supported
+by experimental data on interaction. Using these ingredients, we show
+that the property of interest (ambiguity) is prevalent in languages that
+optimize our measure of efficiency (Simulation 1). Further, we show how
+ambiguity is used efficiently during local, in-the-moment interactions
+(Simulation 2). Put differently, these simulations examine efficiency
+from two angles -- in the first we vary languages, fixing agents, and
+search for efficient language designs. In the second we vary agents,
+fixing language, and examine efficient use. \par
 
 The contributions of this work are twofold -- we derive a novel measure
 of linguistic efficiency and also show how the reference game framework,
@@ -216,7 +217,7 @@ meaning (see Figure 1). Utterances may have different relative costs,
 operationalized via a prior over utterances \(P(U)\). Similarly,
 meanings differ in the relative degree to which they need to be talked
 about, operationalized as a prior over meanings
-\(P(M)\)\footnote{The prior over meanings are analogous to the \textit{need probabilities} assumed in previous work (Regier, Kemp \& Kay (2015).}.
+\(P(M)\)\footnote{The prior over meanings is equivalent to the \textit{need probabilities} assumed in previous work (Regier, Kemp \& Kay (2015).}.
 We consider a set of contexts \(C\) with an associated prior \(P(C)\).
 Each context \(c\in C\) describes a different distribution over meanings
 e.g. \(p(M|C=c_i) \neq p(M|C=c_j)\). Finally, we consider a set of
@@ -232,7 +233,7 @@ The boolean matrix describes the literal semantics of the language. We
 define a language as ``ambiguous'' if there is some utterance
 \(u \in U\) which can apply to multiple meanings (i.e.
 \(|[[u_i]]| > 1\))\footnote{We use double brackets $[[\dots]]$ to represent denotation.}.
-In Figure 1 both the words ``square'' and ``green'' are ambigous so we
+In Figure 1 both the words ``square'' and ``green'' are ambiguous so we
 would say that \(\ell\) contains ambiguity.
 
 \subsubsection{Speakers and listeners}\label{speakers-and-listeners}
@@ -245,8 +246,7 @@ essential Gricean pragmatic principles -- agents reason about one
 another and their shared context (Grice, 1975). We adopt RSA as our
 representational framework to model Gricean (rational and pragmatic)
 speaker-listeners in the reference game setting (see
-\href{https://github.com/benpeloquin7/zipf_principles/blob/master/paper/supplementary_materials.pdf}{SI}
-and Goodman \& Frank (2016) for a review).\par
+\href{https://bit.ly/2RBSGcU}{SI}).\par
 
 An RSA \emph{speaker agent} defines a conditional distribution over
 utterances, mapping from intended meanings \(M\) to utterances \(U\)
@@ -279,7 +279,7 @@ listener effort to communicate over all possible communicative events
 
 We assume that speaker effort is related to the surprisal of an
 utterance in a particular
-context\footnote{In the current set of simulations we consider utterances costs as independent from context (ie. $p(u|c)p(c)=p(u)p(c)$).}
+context\footnote{In the current set of simulations we consider utterances costs as independent from context (i.e.. $p(u|c)p(c)=p(u)p(c)$).}
 -- intuitively, the number of bits needed to encode the utterance \(u\).
 This particular formalization of speaker-cost is general enough to
 accommodate a range of cost instantiations, such as production
@@ -304,8 +304,7 @@ to that object by sampling from her conditional distribution
 \(S(u|m, c; \ell)\) (i.e. \(e \sim p(c)p(m|c)S(u|m, c; \ell)\)). From
 these ingredients it is possible to derive the following objective
 between the speaker and listener distributions (see
-\href{https://github.com/benpeloquin7/zipf_principles/blob/master/paper/supplementary_materials.pdf}{SI 2.1}
-for complete derivation).
+\href{https://bit.ly/2RBSGcU}{SI 2.1} for complete derivation).
 
 \begin{equation}
 \begin{split}
@@ -372,7 +371,7 @@ ambiguity efficiently in a conversation?\par
 
 }
 
-\caption[Panel (A) Vertical axis shows the proportion of optimal languages containing ambiguity]{Panel (A) Vertical axis shows the proportion of optimal languages containing ambiguity. Horizontal axis shows the context-size (1-4) in each condition. Optimal language under CE objective (red). Speaker-optimal (blue). Listener-optimal (green). Error bars represent 95 percent confidence intervals. Panel (B), example CE-optimal language (ambiguous) under in a four-condition context. Panel (C), example CE-optimal language (unambiguous) in a single-condition context.}\label{fig:plot-optimal-langs}
+\caption[Panel (A) Vertical axis shows the proportion of optimal languages containing ambiguity]{Panel (A) Vertical axis shows the proportion of optimal languages containing ambiguity. Horizontal axis shows the context-size (1-4) in each condition. Optimal language under CE objective (red). Speaker-optimal (blue). Listener-optimal (green). Error bars represent 95 percent confidence intervals. Panel (B), example CE-optimal language (ambiguous) from a four-context simulation. Panel (C), example CE-optimal language (unambiguous) from a single-context simulation.}\label{fig:plot-optimal-langs}
 \end{figure*}
 \end{CodeChunk}
 
@@ -437,13 +436,12 @@ accordingly.\par
 
 \subsubsection{Baselines}\label{baselines}
 
-For comparison, we also examine properties of optimal languages under
-two additional objectives. Zipf (1949) proposed that the speaker-optimal
+For comparison, we examine properties of optimal languages under two
+additional objectives. Zipf (1949) proposed that the speaker-optimal
 language \(\ell_{speaker}^*\) would minimize speaker effort and the
 listener-optimal language \(\ell_{listener}^*\) would minimize listener
 effort. We define these objectives using the first and second half of
-equation 1 (see
-\href{https://github.com/benpeloquin7/zipf_principles/blob/master/paper/supplementary_materials.pdf}{SI 2.2.}).\par
+equation 1 (see \href{https://bit.ly/2RBSGcU}{SI 2.2.}).\par
 
 \subsection{Results and Discussion}\label{results-and-discussion}
 
@@ -494,8 +492,8 @@ lead to misunderstanding if context is not informative. But, if by a
 later position enough contextual information has accumulated, it may be
 efficient to use the ambiguous expression. We pursue this general
 framework in Simulation 2 -- examining when in a discourse using
-ambigity is efficient. Note that we will consider ``context'' as
-analogous to a ``topic'' of conversation. \par
+ambiguity is efficient. We will consider ``context'' as analogous to a
+``topic'' of conversation. \par
 
 \subsection{Simulation set-up}\label{simulation-set-up-1}
 
@@ -519,7 +517,7 @@ using the discourse history \(D\).\par
 We conduct \(N=600\) simulations, generating discourses of length
 \(|D|=30\) utterances, comparing three speaker models (\(n=200\) each).
 We consider a single language
-\(\ell\)\footnote{See SI for the matrix notation of this langauge.} with
+\(\ell\)\footnote{See SI for the matrix notation of this language.} with
 \(|U|=6\) and \(|M|=4\) in which two of the utterances are ambiguous and
 lower cost than the unambiguous utterances. (Note that use of this
 particular language is not essential -- the results are broadly
@@ -539,9 +537,8 @@ discourse. We compare two baseline models. The first, a
 about a listener, but assumes they have no access to the discourse
 history. The second, a \textit{No pragmatics} baseline speaker does not
 consider a listener at all, but produces utterances according to the
-underlying langauge semantics (\(\ell\)) and topic probabilities
-(\(p(M|C=c_{current}\)) (see
-\href{https://github.com/benpeloquin7/zipf_principles/blob/master/paper/supplementary_materials.pdf}{SI 3}).\par
+underlying language semantics (\(\ell\)) and topic probabilities
+(\(p(M|C=c_{current}\)) (see \href{https://bit.ly/2RBSGcU}{SI 3}).\par
 
 \subsection{Hypotheses}\label{hypotheses}
 
@@ -566,26 +563,26 @@ baseline avoids ambiguous utterances entirely. But, the
 start of the discourse, employing it increasingly as the discourse
 proceeds. Panel (C) tracks our CE objective for each model over the
 discourse. Note that the objective decreases for all three models,
-primarily driven by the listener updating his belief about the actual
-topic (\(P(C=c_{current}|D)\)). However, the objective declines more
-quickly under the \textit{Full} and \textit{Partial pragmatic} speakers
-as listener agents are better able to infer the correct context.
-Additionally, the difference in CE between the \textit{Full}- and
-\textit{Partial pragmatic} models at the end of the discourse is driven
-by the reduction in speaker costs. Panel (B) tracks speaker effort,
-which remains constant in both \textit{No pragmatic} and
+primarily driven by the listeners updating their beliefs about the
+actual topic (\(P(C=c_{current}|D)\)). However, the objective declines
+more quickly under the \textit{Full} and \textit{Partial pragmatic}
+speakers as listener agents are better able to infer the correct
+context. Additionally, the difference in CE between the \textit{Full}-
+and \textit{Partial pragmatic} models at the end of the discourse is
+driven by the reduction in speaker costs. Panel (B) tracks speaker
+effort, which remains constant in both \textit{No pragmatic} and
 \textit{Partial pragmatic} baselines. But, effort declines in the
-\textit{Full pragmatic} model as she increasingly relies on ambiguous
+\textit{Full pragmatic} model as speakers increasingly rely on ambiguous
 material later in the discourse.\par
 
 \section{General Discussion}\label{general-discussion}
 
-How do the competing pressures of speakers and listeners give rise to
-the distributional regularities found in natural language? Zipf (1949)
-proposed that the asymmetry between speaker and listener costs gives
-rise to a range of properties at the level of the lexicon. We explored
-the interactions of rational pragmatic agents as a framework for
-understanding efficient language structure and use. We focused on an
+How do the competing pressures imposed by speakers and listeners give
+rise to the distributional regularities found in natural language? Zipf
+(1949) proposed that the asymmetry between speaker and listener costs
+gives rise to a range of properties at the level of the lexicon. We
+explored the interactions of rational pragmatic agents as a framework
+for understanding efficient language structure and use. We focused on an
 argument on the communicative function of ambiguity (Piantadosi et al.,
 2011), deriving a novel speaker-listener Cross-Entropy objective for
 measuring the efficiency of linguistic systems from first principles of
@@ -601,16 +598,13 @@ of simplicity and informativeness (Kemp \& Regier, 2012) or expressivity
 and compressibility (Smith, Tamariz, \& Kirby, 2013) to explain
 linguistic regularities. Future work should assess the degree to which
 we can derive the same properties as previous studies using our current
-framework. In line with this idea, a primary focus of the current work
-is to provide a case-study on the productivity of assessing
-functionalist theories in repeated reference games between rational
-pragmatic agents. We hope this framework can serve as a domain general
-tool to assess the range of functionalist theories examining efficient
-language-structure and use.\par
+framework. More generally, we hope that this framework can serve as a
+domain general tool to assess the range of functionalist theories
+examining efficient language-structure and use.\par
 
 \vspace{1em}
 
-\fbox{\parbox[b][][c]{7.3cm}{\centering {Code and SI: \href{https://bit.ly/2DOnjI4}{\url{https://bit.ly/2DOnjI4}}.}}}
+\fbox{\parbox[b][][c]{7.3cm}{\centering {SI available at: \href{https://bit.ly/2RBSGcU}{\url{https://bit.ly/2RBSGcU}}. Code will be available upon acceptance.}}}
 \vspace{1em} \noindent
 
 \section{References}\label{references}
@@ -685,7 +679,7 @@ function of ambiguity in language. \emph{Cognition}, \emph{122},
 \hypertarget{ref-RegierKempKay2015a}{}
 Regier, T., Kemp, C., \& Kay, P. (2015). Word meanings across languages
 support efficient communication. In B. M. \& W. O'Grady (Ed.), \emph{The
-ahndbook of language emergence (pp. 237-263)}. Hoboken, NJ:
+handbook of language emergence (pp. 237-263)}. Hoboken, NJ:
 Wiley-Blackwell.
 
 \hypertarget{ref-SmithTamarizKirby2013a}{}
