@@ -17,6 +17,7 @@ keywords:
     "Communicative efficiency, Rational Speech Act theory, computational modeling, information theory, agent-based simulation"
     
 output: cogsci2016::cogsci_paper
+final-submission: \cogscifinalcopy
 ---
 
 
