@@ -1,5 +1,3 @@
-<!-- 
-
 # The interactions of rational, pragmatic agents lead to efficient language structure and use
 
 Code and paper for Cogsci 2019.
@@ -55,5 +53,3 @@ We provide a complete derivation of the Zipfian-inspired objective for language 
 * `simulation-runners` contains simulation run and plotting functionality (detailed above).
 * `zipf_principles/ambiguity/webppl/...`
   * `discourse_ambiguity_model.wppl` contains Simulation 2 model code. For best viewing set interpreter to javascript.
-
- -->
