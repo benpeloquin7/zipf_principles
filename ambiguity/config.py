@@ -5,7 +5,7 @@ from simulations import VaryContextSimulations, RecursiveSimulation
 CONTEXT_RUN_PARAMS = {
     'simulator': VaryContextSimulations,
     'run_params': {
-        'n_sims': 500,
+        'n_sims': 2,
         'utterance_order_fn': lambda x: 1.,
         'utterance_order_fn_name': 'uniform',
         'meaning_order_fn': lambda x: 1.,
@@ -26,13 +26,15 @@ CONTEXT_RUN_PARAMS = {
 RECURSIVE_RUN_PARAMS = {
     'simulator': RecursiveSimulation,
     'run_params': {
-        'n_sims': 10,
-        'n_contexts': 1,
+        'n_sims': 1,
         'utterance_order_fn': lambda x: 1.,
         'utterance_order_fn_name': 'uniform',
         'meaning_order_fn': lambda x: 1.,
         'meaning_order_fn_name': 'uniform',
-        'ks': list(range(30)),
+        'speaker_k_range': list(range(1,3)),
+        'listener_k_range': list(range(1,3)),
+        'speaker_alpha': 1,
+        'listener_alpha': 1,
         'verbose': False
     },
     # utterance_order_fn_name-meaning_order_fn_name-speaker_k-listener_k
