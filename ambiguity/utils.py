@@ -65,6 +65,20 @@ def is_valid_matrix(M, filter_fn):
 def idxs2matrix(idxs, m, n):
     """Convert a list of indices to an M x N matrix.
 
+    Parameters
+    ----------
+    idxs: list
+        List of matrix positions.
+    m: int
+        Number of rows.
+    n: int
+        Number of cols.
+
+    Returns
+    -------
+    np.array
+        m X n matrix.
+
     Example
     -------
     m, n = 3, 3

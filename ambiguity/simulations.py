@@ -14,7 +14,16 @@ class Simulation:
     def __init__(self):
         self.name = 'BaseSimulation'
 
-    def run(self, n_sims):
+    def run(self, n_sims,
+            utterance_order_fn,
+            utterance_order_fn_name,
+            meaning_order_fn,
+            meaning_order_fn_name,
+            speaker_k,
+            listener_k,
+            speaker_alpha,
+            listener_alpha,
+            verbose=False):
         NotImplementedError()
 
 
@@ -49,8 +58,8 @@ class SimpleSimulation(Simulation):
             }
 
 
-class OrderedSimulation(Simulation):
-    """Basic ordered simulation."""
+class ContextSimulation(Simulation):
+    """Basic context simulation."""
     def run(self,
             n_sims,
             n_contexts,
@@ -63,6 +72,7 @@ class OrderedSimulation(Simulation):
             speaker_alpha=1,
             listener_alpha=1,
             verbose=False):
+
         all_results = []
         pbar = tqdm.tqdm(total=n_sims * verbose)
         for sim_id in range(n_sims):
@@ -106,6 +116,8 @@ class OrderedSimulation(Simulation):
                 [(idxs, m) for (idxs, m) in generate_all_boolean_matrices_upto(N_UTTERANCES, N_MEANINGS, N_MEANINGS+1) \
                  if all_utterances_meanings_used_filter(m)]
 
+            data_cache = []
+
             d_results = defaultdict(dict)
             for idxs, m in all_matrices:
                 for context_id, context in enumerate(contexts):
@@ -130,12 +142,11 @@ class OrderedSimulation(Simulation):
 
                     # L(m|u, c)p(c) term
                     # in \sum_{u, m}P_s(u, m)*log(L(m|u))
-                    m_simple_listener_costs =  \
+                    m_simple_listener_costs = \
                         listener(m, p_utterances,
                                  p_meanings_,
                                  listener_alpha,
                                  listener_k)
-
 
                     # Safe-keeping for clean-use below
                     args = [('ce', m_speaker, m_listener, ce),
@@ -170,8 +181,12 @@ class OrderedSimulation(Simulation):
                     meaning_order_fn_name
                 d_results[idxs]['speaker_k'] = speaker_k
                 d_results[idxs]['listener_k'] = listener_k
+                d_results[idxs]['speaker_alpha'] = speaker_alpha
+                d_results[idxs]['listener_alpha'] = listener_alpha
                 d_results[idxs]['n_utterances'] = N_UTTERANCES
                 d_results[idxs]['n_meanings'] = N_MEANINGS
+                d_results[idxs]['p_contexts'] = [c.tolist() for c in contexts]
+                d_results[idxs]['p_utterances'] = p_utterances.tolist()
 
                 # Non-pragmatic S and L's
                 # they don't have access to the conditionals so
@@ -259,7 +274,7 @@ class VaryContextSimulations(Simulation):
             speaker_alpha=1,
             listener_alpha=1,
             verbose=False):
-        simulator = OrderedSimulation()
+        simulator = ContextSimulation()
 
         # Note we examine 1-4 contexts
         context_1_params = [n_sims, 1,
@@ -314,6 +329,7 @@ class VaryContextSimulations(Simulation):
             for idxs, vals in x.items():
                 curr_d = vals
                 curr_d['idxs'] = idxs
+                # import pdb; pdb.set_trace();
                 d_results.append(curr_d)
         return d_results
 
@@ -329,208 +345,37 @@ class RecursiveSimulation(Simulation):
 
     def run(self,
             n_sims,
-            n_contexts,
             utterance_order_fn,
             utterance_order_fn_name,
             meaning_order_fn,
             meaning_order_fn_name,
-            ks=[1],
+            speaker_k_range=range(1, 10),
+            listener_k_range=range(1, 10),
+            speaker_alpha=1,
+            listener_alpha=1,
             verbose=False):
-        """
+        simulator = ContextSimulation()
 
-        Parameters
-        -----------
-        TODO (BP) Fill in other parameters.
+        # All combinations of s/l recursion
+        all_recursive_k_combs = \
+            list(it.product(speaker_k_range, listener_k_range))
 
-        ks: list
-            List of speaker/listener recursion levels.
-        """
-        all_results = []
-        pbar = tqdm.tqdm(total=n_sims * verbose)
-        for sim_id in range(n_sims):
-            # Costs
-            ce = CrossEntropy()
-            kl = KL()
-            ferrer = FerrerObjective()
-            sym_ce = SymmetricCrossEntropy()
-            # Set-up
-            # Note hard coding 3X3 matrices
-            N_UTTERANCES = 3
-            N_MEANINGS = 3
-            p_utterances = np.random.dirichlet(
-                [utterance_order_fn(i) for i in range(N_UTTERANCES)])
-            p_meanings = np.random.dirichlet(
-                [meaning_order_fn(i) for i in range(N_MEANINGS)])
-            # Populate contexts
-            contexts = [p_meanings]
-            for i in range(1, n_contexts):
-                contexts.append(np.roll(contexts[0], i + 1))
-            # Baseline model (context isn't informative so we take)
-            # p(m) = \sum_c p(m, c)p(c)
-            p_m_no_context = np.array(contexts)
-            p_m_no_context = \
-                np.sum(p_m_no_context, axis=0) / np.sum(p_m_no_context)
+        # Todo (BP): Just setting single context for now,
+        # but this is likely something that we want to vary.
+        n_contexts = 1
 
-            # Generate languages
-            all_3_3_matrices = \
-                generate_all_boolean_matrices(N_UTTERANCES, N_MEANINGS, 3)
-            all_3_4_matrices = \
-                generate_all_boolean_matrices(N_UTTERANCES, N_MEANINGS, 4)
-            all_3_5_matrices = \
-                generate_all_boolean_matrices(N_UTTERANCES, N_MEANINGS, 5)
-            all_matrices = all_3_3_matrices + \
-                           all_3_4_matrices + \
-                           all_3_5_matrices
-            all_matrices = [(idxs, m) \
-                            for (idxs, m) in all_matrices
-                            if all_meanings_available_filter(m)]
+        results = []
+        pbar = tqdm.tqdm(total=len(all_recursive_k_combs) * verbose)
+        for (s_k, l_k) in all_recursive_k_combs:
+            run_params = [n_sims, n_contexts,
+                          utterance_order_fn, utterance_order_fn_name,
+                          meaning_order_fn, meaning_order_fn_name,
+                          s_k, l_k, speaker_alpha, listener_alpha, True]
+            logging.info("Running recursive sim with "
+                         "depths {}\{} ".format(s_k, l_k))
+            out = simulator.run(*run_params)
 
-            d_results = defaultdict(dict)
-            for idxs, m in all_matrices:
-                for context_id, context in enumerate(contexts):
-                    p_meanings_ = context
-                    for k in ks:
-                        key = str(idxs) + '_{}'.format(k)
-                        m_speaker = col_multiply(
-                            speaker(m, p_utterances, p_meanings_, 1., k), p_meanings_)
-                        m_listener = row_multiply(
-                            listener(m, p_utterances, p_meanings_, 1., k), p_utterances)
-                        m_speaker_no_context = col_multiply(
-                            speaker(m, p_utterances, p_m_no_context, 1., k), p_m_no_context)
-                        m_listener_no_context = row_multiply(
-                            listener(m, p_utterances, p_m_no_context, 1., k), p_utterances)
-                        # For computing \sum_{u, m}P_s(u, m)*log(p(u))
-                        m_simple_speaker_costs = \
-                            row_multiply(m, p_utterances)
-                        # For computing \sum_{u, m}P_s(u, m)*log(L(m|u))
-                        m_simple_listener_costs = \
-                            listener(m, p_utterances, p_meanings_, 1., k)
 
-                        # Normalise to ensure valid probability distributions.
-                        # (handle languages that have assigned
-                        # 0 to particular utterance.)
-                        m_speaker = normalize_m(m_speaker)
-                        m_listener = normalize_m(m_listener)
-                        m_speaker_no_context = normalize_m(m_speaker_no_context)
-                        m_listener_no_context = normalize_m(m_listener_no_context)
 
-                        p_c = (1. / n_contexts)
-                        if key in d_results:
-                            d_results[key]['ce'] += \
-                                ce.compute_cost(m_speaker, m_listener) * \
-                                p_c
-                            d_results[key]['kl'] += \
-                                kl.compute_cost(m_speaker, m_listener) * \
-                                p_c
-                            d_results[key]['ferrer'] += \
-                                ferrer.compute_cost(m_speaker, m_listener) * \
-                                p_c
-                            d_results[key]['sym_ce'] += \
-                                sym_ce.compute_cost(m_speaker, m_listener) * \
-                                p_c
-                            d_results[key]['speaker_entropy'] += \
-                                ce.compute_cost(m_speaker, m_simple_speaker_costs) * \
-                                p_c
-                            d_results[key]['listener_entropy'] += \
-                                ce.compute_cost(m_speaker, m_simple_listener_costs) * \
-                                p_c
-                            d_results[key]['base_speaker_listener_ce'] += \
-                                ce.compute_cost(m_speaker_no_context, m_listener_no_context) * \
-                                p_c
-                        else:
-                            d_results[key]['ce'] = \
-                                ce.compute_cost(m_speaker, m_listener) * \
-                                p_c
-                            d_results[key]['kl'] = \
-                                kl.compute_cost(m_speaker, m_listener) * \
-                                p_c
-                            d_results[key]['ferrer'] = \
-                                ferrer.compute_cost(m_speaker, m_listener) * \
-                                p_c
-                            d_results[key]['sym_ce'] = \
-                                sym_ce.compute_cost(m_speaker, m_listener) * \
-                                p_c
-                            d_results[key]['speaker_entropy'] = \
-                                ce.compute_cost(m_speaker, m_simple_speaker_costs) * \
-                                p_c
-                            d_results[key]['listener_entropy'] = \
-                                ce.compute_cost(m_speaker, m_simple_listener_costs) * \
-                                p_c
-                            d_results[key]['base_speaker_listener_ce'] = \
-                                ce.compute_cost(m_speaker_no_context, m_listener_no_context) * \
-                                p_c
-                            d_results[key]['sim_id'] = sim_id
-                            d_results[key]['contains_ambiguity'] = \
-                                contains_ambiguities(idxs, N_UTTERANCES, N_MEANINGS)
-                            d_results[key]['n_contexts'] = len(contexts)
-                            d_results[key]['utterance_order_fn_name'] = \
-                                utterance_order_fn_name
-                            d_results[key]['meaning_order_fn_name'] = \
-                                meaning_order_fn_name
-                            d_results[key]['speaker_k'] = k
-                            d_results[key]['listener_k'] = k
-                            d_results[key]['n_utterances'] = N_UTTERANCES
-                            d_results[key]['n_meanings'] = N_MEANINGS
 
-            # Track objectives
-            min_ce = np.Inf
-            min_kl = np.Inf
-            min_ferrer = np.Inf
-            min_sym_ce = np.Inf
-            min_speaker_entropy = np.Inf
-            min_listener_entropy = np.Inf
-            min_base_ce = np.Inf
-            for idxs, results in d_results.items():
-                if results['ce'] < min_ce:
-                    min_ce = results['ce']
-                if results['kl'] < min_kl:
-                    min_kl = results['kl']
-                if results['ferrer'] < min_ferrer:
-                    min_ferrer = results['ferrer']
-                if results['sym_ce'] < min_sym_ce:
-                    min_sym_ce = results['sym_ce']
-                if results['speaker_entropy'] < min_speaker_entropy:
-                    min_speaker_entropy = results['speaker_entropy']
-                if results['listener_entropy'] < min_listener_entropy:
-                    min_listener_entropy = results['listener_entropy']
-                if results['base_speaker_listener_ce'] < min_base_ce:
-                    min_base_ce = results['base_speaker_listener_ce']
 
-            # Set mins
-            for idxs, results in d_results.items():
-                results['is_min_ce'] = True \
-                    if results['ce'] == min_ce \
-                    else False
-                results['is_min_kl'] = True \
-                    if results['kl'] == min_kl \
-                    else False
-                results['is_min_ferrer'] = True \
-                    if results['ferrer'] == min_ferrer \
-                    else False
-                results['is_min_sym_ce'] = True \
-                    if results['sym_ce'] == min_sym_ce \
-                    else False
-                results['is_min_speaker_entropy'] = True \
-                    if results['speaker_entropy'] == min_speaker_entropy \
-                    else False
-                results['is_min_listener_entropy'] = True \
-                    if results['listener_entropy'] == min_listener_entropy \
-                    else False
-                results['is_min_base_speaker_listener_ce'] = True \
-                    if results['base_speaker_listener_ce'] == min_base_ce \
-                    else False
-            all_results.append(d_results)
-            pbar.update()
-        pbar.close()
-
-        d_all_results = self.process_results(all_results)
-        return pd.DataFrame(d_all_results)
-
-    def process_results(self, d):
-        d_results = []
-        for x in d:
-            for idxs, vals in x.items():
-                curr_d = vals
-                curr_d['idxs'] = idxs
-                d_results.append(curr_d)
-        return d_results
