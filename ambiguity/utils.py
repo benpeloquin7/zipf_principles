@@ -11,6 +11,7 @@ logging.getLogger().setLevel(logging.INFO)
 def normalize_m(m):
     return m / np.sum(m)
 
+
 def all_meanings_available_filter(M):
     """
 
@@ -50,7 +51,6 @@ def all_utterances_meanings_used_filter(M):
 
     """
     return all_meanings_available_filter(M) and all_utterances_used_filter(M)
-
 
 
 def is_valid_matrix(M, filter_fn):

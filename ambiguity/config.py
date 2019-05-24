@@ -14,7 +14,8 @@ CONTEXT_RUN_PARAMS = {
         'listener_alpha': 1.,
         'speaker_k': 1,
         'listener_k': 1,
-        'verbose': False
+        'verbose': False,
+        'matrix_density': 4
     },
     # fp pattern below
     # ----------------
