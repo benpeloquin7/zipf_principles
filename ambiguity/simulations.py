@@ -71,7 +71,8 @@ class ContextSimulation(Simulation):
             listener_k=1,
             speaker_alpha=1,
             listener_alpha=1,
-            verbose=False):
+            verbose=False,
+            matrix_density=1):
 
         all_results = []
         pbar = tqdm.tqdm(total=n_sims * verbose)
@@ -113,10 +114,11 @@ class ContextSimulation(Simulation):
 
             # Generate all valid matrices (as defined by filter)
             all_matrices = \
-                [(idxs, m) for (idxs, m) in generate_all_boolean_matrices_upto(N_UTTERANCES, N_MEANINGS, N_MEANINGS+1) \
+                [(idxs, m) for (idxs, m) in
+                 generate_all_boolean_matrices_upto(N_UTTERANCES,
+                                                    N_MEANINGS,
+                                                    N_MEANINGS+matrix_density) \
                  if all_utterances_meanings_used_filter(m)]
-
-            data_cache = []
 
             d_results = defaultdict(dict)
             for idxs, m in all_matrices:
@@ -273,7 +275,8 @@ class VaryContextSimulations(Simulation):
             listener_k=1,
             speaker_alpha=1,
             listener_alpha=1,
-            verbose=False):
+            verbose=False,
+            matrix_density=1):
         simulator = ContextSimulation()
 
         # Note we examine 1-4 contexts
@@ -283,28 +286,32 @@ class VaryContextSimulations(Simulation):
                             meaning_order_fn,
                             meaning_order_fn_name,
                             speaker_k, listener_k,
-                            speaker_alpha, listener_alpha]
+                            speaker_alpha, listener_alpha,
+                            verbose, matrix_density]
         context_2_params = [n_sims, 2,
                             utterance_order_fn,
                             utterance_order_fn_name,
                             meaning_order_fn,
                             meaning_order_fn_name,
                             speaker_k, listener_k,
-                            speaker_alpha, listener_alpha]
+                            speaker_alpha, listener_alpha,
+                            verbose, matrix_density]
         context_3_params = [n_sims, 3,
                             utterance_order_fn,
                             utterance_order_fn_name,
                             meaning_order_fn,
                             meaning_order_fn_name,
                             speaker_k, listener_k,
-                            speaker_alpha, listener_alpha]
+                            speaker_alpha, listener_alpha,
+                            verbose, matrix_density]
         context_4_params = [n_sims, 4,
                             utterance_order_fn,
                             utterance_order_fn_name,
                             meaning_order_fn,
                             meaning_order_fn_name,
                             speaker_k, listener_k,
-                            speaker_alpha, listener_alpha]
+                            speaker_alpha, listener_alpha,
+                            verbose, matrix_density]
         params = [
             context_1_params,
             context_2_params,
@@ -329,7 +336,6 @@ class VaryContextSimulations(Simulation):
             for idxs, vals in x.items():
                 curr_d = vals
                 curr_d['idxs'] = idxs
-                # import pdb; pdb.set_trace();
                 d_results.append(curr_d)
         return d_results
 

@@ -1,4 +1,7 @@
 
+# General
+.DS_Store
+
 # Python
 .idea/
 */__pycache__/
@@ -17,3 +20,8 @@ practice-sims/
 
 # Tex
 *.tex
+
+# Presentations
+hai-poster* 
+presentations/
+posters/
