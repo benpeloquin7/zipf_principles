@@ -82,6 +82,103 @@ Zipf (1949) proposed that the particular distributional properties found in natu
 \end{split}
 \end{equation}
 
+We assume that speaker effort is related to the surprisal of an utterance in a particular context -- intuitively, the number of bits needed to encode the utterance $u$.\footnote{In the current set of simulations we consider utterances costs as independent from context (i.e. $p(u|c)=p(u)$). Hence surprisal can be thought of more simply as cost.} This particular formalization of speaker-cost is general enough to accommodate a range of cost instantiations, such as production difficulty via articulation effort, cognitive effort related to lexical access, or others (Bennett \& Goodman, 2015).\par
+
+$$\text{speaker effort} = -log_2(p(u|c))$$
+
+We assume listener effort is the surprisal of a meaning given an utterance. This operationalization of listener effort is intuitively related to existing work in sentence processing in which word comprehension difficulty is proportional to surprisal (Hale, 2001; Levy, 2008).
+
+$$\text{listener effort} = -log_2(L(m|u, c; \ell))$$
+
+Rewriting (1) we have
+\begin{equation}
+\begin{split}
+\text{Efficiency}(S, L, C, \ell) = \mathbb{E}_{e \sim P(E)}[-log_2(p(u|c))] + 
+\mathbb{E}_{e \sim P(E)}[-log_2(L(m|u, c; \ell))]
+\end{split}
+\end{equation}
+
+We assume that the particular joint distribution over utterance-meaning-context triples $e = <u, m, c>$  follows from a simple generative model: First, some context is sampled with probability $p(c)$. Then some meaning is sampled with probability $p(m|c)$. Our speaker attempts to convey this intended meaning to a listener via an utterance $u$ by sampling from the speaker conditional distribution $S(u|m, c; \ell)$. This allows us to re-write the objective as:
+
+\begin{equation}
+\begin{split}
+  = -\sum_{u, m, c}P_{speaker}(u, m | c; \ell)p(c)[log_2(p(u|c))] - \\ 
+   \sum_{u, m, c}P_{speaker}(u, m | c; \ell)p(c)[log_2(L(m|u, c; \ell))]
+\end{split}
+\end{equation}
+
+\begin{equation}
+\begin{split}
+  = -\sum_{c\in C}p(c)(\sum_{u, m}P_{speaker}(u, m | c; \ell)[log_2(p(u|c))] + 
+  \sum_{u, m}P_{speaker}(u, m | c; \ell)[log_2(L(m|u, c; \ell))])
+\end{split}
+\end{equation}
+
+\begin{equation}
+\begin{split}
+ = -\sum_{c\in C}p(c)\sum_{u, m}P_{speaker}(u, m | c; \ell)[log_2(L(m|u, c; \ell)p(u|c)]
+ \end{split}
+\end{equation}
+
+Note that $P_{listener}(u, m | c; \ell) = L(m|u, c; \ell)p(u|c)$:
+
+\begin{equation}
+\begin{split}
+ = -\sum_{c\in C}p(c)\sum_{u, m}P_{speaker}(u, m | c; \ell)[log_2(P_{listener}(u, m | c; \ell))]
+ \end{split}
+\end{equation}
+
+The inner summation of (6) is the cross-entropy between speaker and listener conditional distributions over utterance-meaning pairs.
+
+\begin{equation}
+\begin{split}
+ = -\sum_{c\in C}p(c) H_{cross}(P_{speaker}(u, m |c; \ell), P_{listener}(u, m |c; \ell))
+ \end{split}
+\end{equation}
+
+This final form is simply an expectation of speaker-listener cross-entropy over contextualized language use.
+
+\begin{equation}
+\begin{split}
+ = \mathbb{E}_{c \sim P(C)}[H_{cross}(P_{speaker}, P_{listener}|c; \ell)]
+ \end{split}
+\end{equation}
+
+Note that in the case that $|C| =1$, our objective simplifies to a simple Cross-Entropy between speaker-listener joint distributions over utterance-meaning pairs.\par
+
+\begin{equation}
+\begin{split}
+ = H_{cross}(P_{speaker}, P_{listener}; \ell)
+ \end{split}
+\end{equation}
+
+From an information-theoretic perspective this objective is intuitive: $H_{cross}$ denotes the Cross-Entropy (CE), a measure of dissimilarity between two distributions -- the average number of bits required to communicate under one distribution, given that the “true” distribution differs. In our case, we have an expectation over this term -- the expected difference between the distributions assumed by the speaker $P_{speaker}$ and listener $P_{listener}$ given a set of contexts $C$. In other words, an "efficient" language $\ell$ minimizes the distance between what speakers and listeners think.\par
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Zipf (1949) proposed that the particular distributional properties found in natural language emerge from competing speaker and listener pressures. We operationalize this objective in equation (1) -- the efficiency of a linguistic system $\ell$ being used by speaker and listener agents $S$ and $L$ is the sum of the expected speaker and listener effort to communicate over all possible communicative events $e \in E$.\par
+
+\begin{equation}
+\begin{split}
+  \text{Efficiency}(S, L, \ell) = \mathbb{E}_{e \sim P(E)}[\text{speaker effort}] \\+ \mathbb{E}_{e \sim P(E)}[\text{listener effort}]
+\end{split}
+\end{equation}
+
 We assume that speaker effort is related to the surprisal of an utterance in a particular context\footnote{In the current set of simulations we consider utterance costs as independent from context (i.e.. $p(u|c)p(c)=p(u)p(c)$).} -- intuitively, the number of bits needed to encode the utterance $u$. This particular formalization of speaker-cost is general enough to accommodate a range of cost instantiations, such as production difficulty via articulation effort, cognitive effort related to lexical access, or others [@BennettGoodman2015a].\par
 
 $$\text{speaker effort} = -log_2(p(u|c))$$
@@ -123,7 +220,7 @@ We conduct $N=2000$ simulations. For each simulation we enumerate the set of *va
 
 We define language efficiency as a function of the particular semantic mappings induced by that language, the speaker and listener agents ($S$ and $L$), as well as the utterance ($P(U)$), meaning ($P(M)$), and context priors ($P(C)$). Rather than assume particular structure, for each simulation we generate $P(U) \sim \text{Dir}(1, |U|)$, $P(M|C=c) \sim \text{Dir}(1, |M|)$ (a separate conditional distribution over meanings for each context $c$), and $P(C) \sim \text{Dir}(1, |C|)$, where $\text{Dir}(1, k)$ specifies the uniform Dirichlet distribution over a $k$-dimensional probability vector.\par
 
-```{r plot-optimal-use, fig.env = "figure*", fig.pos = "h", fig.width=6, fig.height=3, fig.align = "center", set.cap.width=T, num.cols.cap=2, fig.cap = "(A) shows the empirical probability that our speaker used an ambiguous utterance as a function of discourse position. (B) shows speaker effort across the three models. (C) shows the Cross-Entropy objective under our three speaker models. Error bars represent 95 percent confidence intervals."}
+  ```{r plot-optimal-use, fig.env = "figure*", fig.pos = "h", fig.width=6, fig.height=3, fig.align = "center", set.cap.width=T, num.cols.cap=2, fig.cap = "(A) shows the empirical probability that our speaker used an ambiguous utterance as a function of discourse position. (B) shows speaker effort across the three models. (C) shows the Cross-Entropy objective under our three speaker models. Error bars represent 95 percent confidence intervals."}
 
 img <- png::readPNG("figs/discourse_grid_plot.png")
 grid::grid.raster(img)

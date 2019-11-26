@@ -1,11 +1,11 @@
 """config.py"""
 
-from simulations import VaryContextSimulations, RecursiveSimulation
+from .simulations import VaryContextSimulations, RecursiveSimulation
 
 CONTEXT_RUN_PARAMS = {
     'simulator': VaryContextSimulations,
     'run_params': {
-        'n_sims': 2,
+        'n_sims': 30,
         'utterance_order_fn': lambda x: 1.,
         'utterance_order_fn_name': 'uniform',
         'meaning_order_fn': lambda x: 1.,
@@ -15,7 +15,7 @@ CONTEXT_RUN_PARAMS = {
         'speaker_k': 1,
         'listener_k': 1,
         'verbose': False,
-        'matrix_density': 4
+        'matrix_density': 2
     },
     # fp pattern below
     # ----------------

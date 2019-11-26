@@ -12,7 +12,7 @@ Example
 import logging
 import os
 
-from config import SIMULATIONS
+from .config import SIMULATIONS
 
 logging.getLogger().setLevel(logging.INFO)
 
